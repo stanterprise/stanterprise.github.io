@@ -1,387 +1,232 @@
 ---
 title: Integrations
 weight: 4
-description: Connect Observer with your existing tools and workflows
+description: Connect Observer with your test frameworks and CI/CD pipelines
 ---
 
 # Observer Integrations
 
-Observer integrates seamlessly with your existing tools and infrastructure. This page covers the available integrations and how to configure them.
+Observer integrates with your test frameworks to provide comprehensive test observability. This page covers the available integrations and how to configure them.
 
-## Monitoring & Metrics
+## Test Frameworks
 
-### Prometheus
+### Playwright Reporter
 
-Observer is fully compatible with Prometheus metrics:
+The primary way to integrate Observer with your tests is through the **stanterprise-playwright-reporter**. This custom reporter sends test execution events to Observer in real-time.
 
-```yaml
-# observer.yaml
-integrations:
-  prometheus:
-    enabled: true
-    scrape_interval: 15s
-    scrape_configs:
-      - job_name: 'kubernetes-pods'
-        kubernetes_sd_configs:
-          - role: pod
-```
-
-**Features:**
-- Native PromQL support
-- Automatic service discovery
-- Remote write endpoint
-- Alert manager integration
-
-### Grafana
-
-Visualize Observer data in Grafana:
-
-1. Add Observer as a data source in Grafana
-2. Configure the connection:
-   - Type: Prometheus
-   - URL: `http://observer-api:9090`
-3. Import Observer dashboards from the community
-
-### Datadog
-
-Forward metrics to Datadog:
-
-```yaml
-integrations:
-  datadog:
-    enabled: true
-    api_key: your-api-key
-    site: datadoghq.com
-```
-
-## Distributed Tracing
-
-### OpenTelemetry
-
-Observer has native OpenTelemetry support:
-
-```yaml
-# Application configuration
-exporters:
-  otlp:
-    endpoint: observer-collector:4317
-    insecure: true
-```
-
-**Supported formats:**
-- OTLP (gRPC and HTTP)
-- Jaeger
-- Zipkin
-
-### Jaeger
-
-Configure Jaeger integration:
-
-```yaml
-integrations:
-  jaeger:
-    enabled: true
-    collector_endpoint: observer-collector:14250
-    agent_endpoint: observer-agent:6831
-```
-
-## Log Management
-
-### Fluentd
-
-Forward logs from Fluentd to Observer:
-
-```xml
-<match **>
-  @type http
-  endpoint http://observer-collector:8080/v1/logs
-  json_array true
-  
-  <format>
-    @type json
-  </format>
-  
-  <buffer>
-    @type file
-    path /var/log/fluentd-buffer/observer
-    flush_interval 5s
-  </buffer>
-</match>
-```
-
-### Logstash
-
-Use Logstash to send logs to Observer:
-
-```ruby
-output {
-  http {
-    url => "http://observer-collector:8080/v1/logs"
-    http_method => "post"
-    format => "json"
-  }
-}
-```
-
-### Filebeat
-
-Configure Filebeat to forward logs:
-
-```yaml
-output.http:
-  hosts: ["observer-collector:8080"]
-  path: "/v1/logs"
-  codec.json:
-    pretty: false
-```
-
-## Cloud Platforms
-
-### Kubernetes
-
-Observer integrates deeply with Kubernetes:
-
-- **Service Discovery**: Automatic discovery of services and pods
-- **Metrics Collection**: Node, pod, and container metrics
-- **Log Collection**: Automatic log aggregation
-- **Resource Monitoring**: CPU, memory, and storage tracking
-
-Deploy the Observer Kubernetes operator:
+**Quick Setup:**
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/observer/observer/main/deploy/kubernetes/operator.yaml
+npm install stanterprise-playwright-reporter --save-dev
 ```
 
-### AWS
+```typescript
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
 
-Collect data from AWS services:
-
-```yaml
-integrations:
-  aws:
-    enabled: true
-    region: us-east-1
-    services:
-      - cloudwatch
-      - elb
-      - rds
-      - lambda
+export default defineConfig({
+  reporter: [
+    ['list'],
+    ['stanterprise-playwright-reporter', {
+      grpcAddress: 'localhost:50051'
+    }]
+  ],
+});
 ```
 
-### Google Cloud Platform
+**Key Features:**
+- Real-time test event streaming
+- Step-by-step execution tracking
+- Automatic attachment handling (screenshots, videos, traces)
+- Sharding support for parallel execution
+- Custom metadata injection
+- Retry logic with exponential backoff
 
-Monitor GCP resources:
+📖 See the [detailed Playwright Reporter guide](/docs/integrations/playwright-reporter/) for complete configuration options and examples.
 
-```yaml
-integrations:
-  gcp:
-    enabled: true
-    project_id: your-project-id
-    services:
-      - compute
-      - gke
-      - cloud-sql
-```
-
-### Azure
-
-Connect to Azure Monitor:
-
-```yaml
-integrations:
-  azure:
-    enabled: true
-    tenant_id: your-tenant-id
-    subscription_id: your-subscription-id
-```
-
-## Alerting & Notifications
-
-### Slack
-
-Send alerts to Slack:
-
-```yaml
-alerting:
-  receivers:
-    - name: slack
-      type: slack
-      webhook_url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
-      channel: '#alerts'
-```
-
-### PagerDuty
-
-Integrate with PagerDuty for incident management:
-
-```yaml
-alerting:
-  receivers:
-    - name: pagerduty
-      type: pagerduty
-      integration_key: your-integration-key
-      severity: critical
-```
-
-### Email
-
-Configure email notifications:
-
-```yaml
-alerting:
-  receivers:
-    - name: email
-      type: email
-      smtp_server: smtp.gmail.com:587
-      from: alerts@observer.io
-      to:
-        - team@example.com
-```
-
-## CI/CD
+## CI/CD Integrations
 
 ### GitHub Actions
 
-Monitor your CI/CD pipelines:
+Integrate Observer with GitHub Actions workflows:
 
 ```yaml
-# .github/workflows/ci.yml
-- name: Send metrics to Observer
-  run: |
-    curl -X POST http://observer:8080/v1/metrics \
-      -H "Content-Type: application/json" \
-      -d '{"pipeline": "ci", "status": "success", "duration": 120}'
+name: E2E Tests
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run Playwright tests
+        env:
+          STANTERPRISE_GRPC_ADDRESS: observer.example.com:50051
+          STANTERPRISE_META_BUILD_ID: ${{ github.run_id }}
+          STANTERPRISE_META_BRANCH: ${{ github.ref_name }}
+          STANTERPRISE_META_COMMIT_SHA: ${{ github.sha }}
+        run: npx playwright test
+```
+
+### GitLab CI
+
+Configure Observer in GitLab CI:
+
+```yaml
+test:
+  image: mcr.microsoft.com/playwright:latest
+  script:
+    - npm ci
+    - npx playwright test
+  variables:
+    STANTERPRISE_GRPC_ADDRESS: "observer.example.com:50051"
+    STANTERPRISE_META_BUILD_ID: "$CI_PIPELINE_ID"
+    STANTERPRISE_META_BRANCH: "$CI_COMMIT_REF_NAME"
+    STANTERPRISE_META_COMMIT_SHA: "$CI_COMMIT_SHA"
 ```
 
 ### Jenkins
 
-Use the Observer Jenkins plugin:
+Use Observer in Jenkins pipelines:
 
 ```groovy
 pipeline {
     agent any
+    
+    environment {
+        STANTERPRISE_GRPC_ADDRESS = 'observer.example.com:50051'
+        STANTERPRISE_META_BUILD_ID = "${BUILD_ID}"
+        STANTERPRISE_META_BRANCH = "${GIT_BRANCH}"
+    }
+    
     stages {
-        stage('Build') {
+        stage('Test') {
             steps {
-                observerMetrics(
-                    name: 'build',
-                    value: 1
-                )
+                sh 'npm ci'
+                sh 'npx playwright test'
             }
         }
     }
 }
 ```
 
-### GitLab CI
+## Deployment Integrations
 
-Track GitLab CI metrics:
+### Docker
+
+Run Observer with Docker:
+
+```bash
+# All-in-One mode (development)
+docker run -d \
+  -p 3000:80 \
+  -p 50051:50051 \
+  -v observer-data:/data \
+  ghcr.io/stanterprise/observer/aio:latest
+```
+
+### Kubernetes
+
+Deploy Observer on Kubernetes using Helm:
+
+```bash
+# Add Helm repository
+helm install observer oci://ghcr.io/stanterprise/observer/charts/observer --version 0.1.0
+
+# Create service for test clients
+kubectl port-forward svc/observer-ingestion 50051:50051
+```
+
+### Docker Compose
+
+Use Docker Compose for local development:
 
 ```yaml
-after_script:
-  - curl -X POST http://observer:8080/v1/metrics \
-    -d "job_duration=$CI_JOB_DURATION"
+version: '3.8'
+services:
+  observer:
+    image: ghcr.io/stanterprise/observer/aio:latest
+    ports:
+      - "3000:80"
+      - "50051:50051"
+    volumes:
+      - observer-data:/data
+
+volumes:
+  observer-data:
 ```
 
-## Databases
+## Custom Metadata
 
-### PostgreSQL
+Enhance your test runs with custom metadata using environment variables:
 
-Monitor PostgreSQL metrics:
+```bash
+# Build information
+STANTERPRISE_META_BUILD_ID=12345
+STANTERPRISE_META_BUILD_URL=https://ci.example.com/build/12345
 
-```yaml
-integrations:
-  postgresql:
-    enabled: true
-    connection: postgresql://user:pass@localhost/db
-    metrics:
-      - connections
-      - queries
-      - replication
+# Git information
+STANTERPRISE_META_BRANCH=feature/new-feature
+STANTERPRISE_META_COMMIT_SHA=abc123def456
+STANTERPRISE_META_AUTHOR=john.doe@example.com
+
+# Environment information
+STANTERPRISE_META_ENVIRONMENT=staging
+STANTERPRISE_META_REGION=us-west-2
+
+# Run your tests
+npx playwright test
 ```
 
-### MySQL
+All metadata with the `STANTERPRISE_META_` prefix is automatically included in test run reports.
 
-Collect MySQL metrics:
+## Architecture Components
 
-```yaml
-integrations:
-  mysql:
-    enabled: true
-    connection: mysql://user:pass@localhost:3306
-```
+Observer is built on a distributed architecture:
 
-### MongoDB
+- **Ingestion Service**: Receives gRPC test events from the Playwright reporter
+- **NATS JetStream**: Message broker for event streaming
+- **Processor Service**: Processes and persists test events
+- **API Service**: Provides REST/GraphQL API and WebSocket streaming
+- **Web UI**: React-based dashboard for visualizing test runs
 
-Monitor MongoDB clusters:
+## Configuration
 
-```yaml
-integrations:
-  mongodb:
-    enabled: true
-    connection: mongodb://localhost:27017
-    databases:
-      - production
-```
+### Reporter Configuration
 
-## Message Queues
+Control reporter behavior through environment variables:
 
-### Kafka
+- `STANTERPRISE_GRPC_ADDRESS`: gRPC server address (default: `localhost:50051`)
+- `STANTERPRISE_GRPC_ENABLED`: Enable/disable reporting (default: `true`)
+- `STANTERPRISE_RUN_ID`: Custom run ID for aggregating sharded tests
 
-Monitor Kafka clusters:
+### Observer Configuration
 
-```yaml
-integrations:
-  kafka:
-    enabled: true
-    brokers:
-      - kafka-1:9092
-      - kafka-2:9092
-    metrics:
-      - broker_metrics
-      - topic_metrics
-      - consumer_lag
-```
+Configure Observer services:
 
-### RabbitMQ
+**Ingestion Service:**
+- `PORT`: gRPC listening port (default: `50051`)
+- `NATS_URL`: NATS server URL
 
-Collect RabbitMQ metrics:
+**Processor Service:**
+- `MONGODB_URI`: MongoDB connection string
+- `NATS_URL`: NATS server URL
 
-```yaml
-integrations:
-  rabbitmq:
-    enabled: true
-    url: http://rabbitmq:15672
-    username: admin
-    password: admin
-```
-
-## Custom Integrations
-
-Create custom integrations using the Observer API:
-
-```python
-import requests
-
-def send_metric(name, value, tags=None):
-    response = requests.post(
-        'http://observer:8080/v1/metrics',
-        json={
-            'name': name,
-            'value': value,
-            'tags': tags or {},
-            'timestamp': int(time.time())
-        }
-    )
-    return response.json()
-```
-
-## API Documentation
-
-For detailed API documentation, visit the [Observer API Reference](https://api-docs.observer.io).
+**API Service:**
+- `PORT`: HTTP listening port (default: `8080`)
+- `MONGODB_URI`: MongoDB connection string
+- `NATS_URL`: NATS server URL for WebSocket streaming
 
 ## Next Steps
 
-- [Getting Started](/docs/getting-started/) - Set up Observer
-- [Architecture](/docs/architecture/) - Understand Observer's design
-- [Demo](/docs/demo/) - Try Observer with sample integrations
+- [Playwright Reporter Guide](/docs/integrations/playwright-reporter/) - Detailed reporter configuration
+- [Architecture](/docs/architecture/) - Understand Observer's architecture
+- [Installation](/docs/install/) - Deploy Observer
+- [Demo](/docs/demo/) - Try Observer with sample tests

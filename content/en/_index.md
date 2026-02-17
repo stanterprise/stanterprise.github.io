@@ -13,25 +13,25 @@ title: Observer
 {{< /blocks/cover >}}
 
 {{% blocks/lead color="primary" %}}
-Observer empowers development teams with real-time insights into their applications and infrastructure. 
-Built for cloud-native environments, Observer provides the visibility you need to understand, debug, and optimize your systems.
+Observer is a test observability system that collects test execution events via gRPC, providing real-time insights into your test runs. 
+Built for modern CI/CD pipelines, Observer helps teams understand test performance, track failures, and optimize test execution.
 {{% /blocks/lead %}}
 
 {{% blocks/section color="dark" type="row" %}}
-{{% blocks/feature icon="fa-lightbulb" title="Real-Time Monitoring" %}}
-Monitor your applications and infrastructure in real-time with powerful dashboards and alerting capabilities.
+{{% blocks/feature icon="fa-lightbulb" title="Real-Time Test Monitoring" %}}
+Track test execution in real-time with WebSocket streaming and comprehensive dashboards.
 {{% /blocks/feature %}}
 
 {{% blocks/feature icon="fa-code" title="Developer-First Design" %}}
-Designed by developers, for developers. Simple APIs, clear documentation, and intuitive workflows.
+Simple gRPC API, Playwright integration, and intuitive web interface for monitoring test runs.
 {{% /blocks/feature %}}
 
-{{% blocks/feature icon="fa-chart-line" title="Advanced Analytics" %}}
-Gain deep insights with built-in analytics, tracing, and metrics aggregation capabilities.
+{{% blocks/feature icon="fa-chart-line" title="Test Analytics" %}}
+Gain insights into test performance, failure patterns, and execution trends across your CI/CD pipeline.
 {{% /blocks/feature %}}
 
-{{% blocks/feature icon="fa-plug" title="Seamless Integrations" %}}
-Integrate with your existing tools and workflows. Support for Kubernetes, Prometheus, and more.
+{{% blocks/feature icon="fa-plug" title="Easy Integration" %}}
+Works seamlessly with Playwright tests via our custom reporter. Kubernetes and Docker ready.
 {{% /blocks/feature %}}
 
 {{% /blocks/section %}}
@@ -40,39 +40,40 @@ Integrate with your existing tools and workflows. Support for Kubernetes, Promet
 
 ## Architecture Overview
 
-Observer is built on a modern, cloud-native architecture designed for scalability and reliability.
+Observer is built on a modern, event-driven architecture designed for scalability and real-time test monitoring.
 
 ```mermaid
 graph TB
-    subgraph "Data Sources"
-        A[Applications]
-        B[Infrastructure]
-        C[Services]
+    subgraph "Test Execution"
+        A[Playwright Tests]
+        B[Reporter Plugin]
     end
     
     subgraph "Observer Platform"
-        D[Data Collector]
-        E[Processing Engine]
-        F[Storage Layer]
-        G[Query API]
+        C[Ingestion Service<br/>gRPC]
+        D[NATS JetStream]
+        E[Processor Service]
+        F[Database<br/>MongoDB]
+        G[API Service]
     end
     
     subgraph "User Interface"
-        H[Web Dashboard]
-        I[CLI Tools]
-        J[API Access]
+        H[Web Dashboard<br/>React]
+        I[WebSocket<br/>Real-Time]
     end
     
-    A --> D
-    B --> D
+    A --> B
+    B -->|gRPC Events| C
     C --> D
     D --> E
     E --> F
     F --> G
     G --> H
-    G --> I
-    G --> J
+    D -.->|Stream| G
+    G -.->|WebSocket| I
+    I --> H
     
+    style C fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
     style D fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
     style E fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
     style F fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff

@@ -6,80 +6,107 @@ description: Quick start guide to get Observer up and running
 
 # Getting Started with Observer
 
-Welcome to Observer! This guide will help you get started with Observer in just a few minutes.
+Welcome to Observer! This guide will help you get started with Observer in just a few minutes. Observer is a test observability system that collects and visualizes test execution events in real-time.
 
 ## Prerequisites
 
 Before you begin, ensure you have:
 
-- A Kubernetes cluster (1.19+) or Docker environment
-- `kubectl` or `docker` CLI installed
-- Basic familiarity with observability concepts
+- Docker (for quick start) or Kubernetes cluster (for production)
+- Node.js and npm (for Playwright tests)
+- Basic familiarity with Playwright testing
 
-## Quick Start
+## Quick Start with Docker
 
-### 1. Install Observer
+The fastest way to get started is using the all-in-one Docker image:
 
-The easiest way to get started is using our Helm chart:
-
-```bash
-# Add the Observer Helm repository
-helm repo add observer https://charts.observer.io
-helm repo update
-
-# Install Observer
-helm install observer observer/observer \
-  --namespace observer \
-  --create-namespace
-```
-
-### 2. Verify Installation
-
-Check that Observer pods are running:
+### 1. Run Observer
 
 ```bash
-kubectl get pods -n observer
+docker run -d \
+  -p 3000:80 \
+  -p 50051:50051 \
+  -v observer-data:/data \
+  --name observer \
+  ghcr.io/stanterprise/observer/aio:latest
 ```
 
-You should see output similar to:
+This starts Observer with:
+- Web UI on port 3000 (http://localhost:3000)
+- gRPC endpoint on port 50051
 
-```
-NAME                        READY   STATUS    RESTARTS   AGE
-observer-api-xxxxx          1/1     Running   0          1m
-observer-collector-xxxxx    1/1     Running   0          1m
-observer-ui-xxxxx           1/1     Running   0          1m
-```
+### 2. Install the Playwright Reporter
 
-### 3. Access the Dashboard
-
-Port-forward to access the Observer dashboard:
+In your Playwright project, install the Observer reporter:
 
 ```bash
-kubectl port-forward -n observer svc/observer-ui 8080:80
+npm install stanterprise-playwright-reporter --save-dev
 ```
 
-Open your browser to http://localhost:8080
+### 3. Configure Playwright
 
-### 4. Configure Data Sources
+Add the reporter to your `playwright.config.ts`:
 
-Observer automatically discovers services in your Kubernetes cluster. To add custom data sources:
+```typescript
+import { defineConfig } from '@playwright/test';
 
-1. Navigate to **Settings** > **Data Sources**
-2. Click **Add Data Source**
-3. Select your source type (Prometheus, Jaeger, etc.)
-4. Configure connection details
+export default defineConfig({
+  reporter: [
+    ['list'], // Keep the default console reporter
+    ['stanterprise-playwright-reporter', {
+      grpcAddress: 'localhost:50051',
+      verbose: true
+    }]
+  ],
+  // ... your other config
+});
+```
+
+### 4. Run Your Tests
+
+Run your Playwright tests as usual:
+
+```bash
+npx playwright test
+```
+
+### 5. View Results
+
+Open http://localhost:3000 in your browser to see your test results in real-time!
+
+## Quick Start with Kubernetes/Helm
+
+For production deployments, use Helm:
+
+```bash
+# Install from OCI registry
+helm install observer oci://ghcr.io/stanterprise/observer/charts/observer --version 0.1.0
+
+# Port forward to access the UI
+kubectl port-forward svc/observer-web 3000:80
+kubectl port-forward svc/observer-ingestion 50051:50051
+```
+
+Configure your Playwright tests to point to your Kubernetes service endpoint.
+
+## Architecture Modes
+
+Observer supports two deployment modes:
+
+- **All-in-One (AIO)**: Single container with embedded services - perfect for local development and CI
+- **Distributed Mode**: Multi-container deployment with separate ingestion, processor, API, and web services - ideal for production
 
 ## Next Steps
 
 Now that Observer is running, explore these topics:
 
-- [Installation Options](/docs/install/) - Learn about different installation methods
+- [Installation Options](/docs/install/) - Learn about different deployment methods
 - [Architecture](/docs/architecture/) - Understand how Observer works
-- [Integrations](/docs/integrations/) - Connect Observer to your tools
+- [Integrations](/docs/integrations/) - Configure the Playwright reporter
 - [Demo](/docs/demo/) - Try Observer with sample applications
 
 ## Getting Help
 
-- Check our [Community](/community/) page for support options
-- Visit our [GitHub repository](https://github.com/stanterprise/stanterprise.github.io) to file issues
-- Join our community chat for real-time help
+- Visit the [Observer GitHub repository](https://github.com/stanterprise/observer) for issues
+- Check the [Reporter GitHub repository](https://github.com/stanterprise/stanterprise-playwright-reporter) for reporter issues
+- Join our [Community](/community/) for support

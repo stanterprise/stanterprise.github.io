@@ -6,181 +6,373 @@ description: Understanding Observer's architecture and components
 
 # Observer Architecture
 
-Observer is built on a modern, cloud-native architecture designed for scalability, reliability, and ease of use.
+Observer is built on a modern, event-driven architecture designed for scalability, reliability, and real-time test monitoring. The system supports two deployment modes: All-in-One (AIO) for simplicity and Distributed Mode for production scalability.
 
 ## System Overview
 
 ```mermaid
 graph TB
-    subgraph "Data Collection Layer"
-        A[Application Agents]
-        B[Infrastructure Collectors]
-        C[Log Forwarders]
-        D[Trace Exporters]
+    subgraph "Test Execution"
+        A[Playwright Tests]
+        B[stanterprise-playwright-reporter]
     end
     
     subgraph "Ingestion Layer"
-        E[API Gateway]
-        F[Data Collector Service]
-        G[Data Validation]
+        C[Ingestion Service<br/>gRPC Port 50051]
+    end
+    
+    subgraph "Message Streaming"
+        D[NATS JetStream<br/>Event Bus]
     end
     
     subgraph "Processing Layer"
-        H[Stream Processor]
-        I[Aggregation Engine]
-        J[Alerting Engine]
+        E[Processor Service<br/>Event Consumer]
     end
     
     subgraph "Storage Layer"
-        K[(Time Series DB)]
-        L[(Document Store)]
-        M[(Object Storage)]
+        F[(MongoDB<br/>Test Data)]
     end
     
-    subgraph "Query Layer"
-        N[Query API]
-        O[Query Cache]
-        P[Query Optimizer]
+    subgraph "API Layer"
+        G[API Service<br/>REST/GraphQL/WebSocket]
     end
     
     subgraph "Presentation Layer"
-        Q[Web UI]
-        R[API Server]
-        S[CLI Tools]
+        H[Web UI<br/>React Dashboard]
+        I[WebSocket<br/>Real-Time Updates]
     end
     
-    A --> E
-    B --> E
-    C --> E
-    D --> E
-    E --> F
+    A --> B
+    B -->|Test Events<br/>gRPC| C
+    C -->|Publish| D
+    D -->|Subscribe| E
+    E -->|Persist| F
     F --> G
-    G --> H
-    H --> I
-    H --> J
-    I --> K
-    H --> L
-    H --> M
-    K --> N
-    L --> N
-    M --> N
-    N --> O
-    O --> P
-    P --> Q
-    P --> R
-    P --> S
+    D -.->|Stream| G
+    G -->|HTTP/GraphQL| H
+    G -.->|WebSocket| I
+    I --> H
     
-    style H fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
-    style I fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
-    style N fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    style C fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    style D fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    style E fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    style G fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
 ```
 
 ## Core Components
 
-### 1. Data Collection Layer
+### 1. Playwright Reporter (stanterprise-playwright-reporter)
 
-The data collection layer gathers observability data from various sources:
+The test client that integrates with Playwright test framework:
 
-- **Application Agents**: Embedded agents that collect application metrics and traces
-- **Infrastructure Collectors**: Gather system-level metrics (CPU, memory, disk, network)
-- **Log Forwarders**: Collect and forward application and system logs
-- **Trace Exporters**: OpenTelemetry-compatible trace collection
+- **Purpose**: Captures test execution events and sends them to Observer
+- **Protocol**: gRPC (protobuf)
+- **Events**: Test begin/end, step begin/end, failures, attachments
+- **Features**:
+  - Fire-and-forget async reporting
+  - Retry logic with exponential backoff
+  - Attachment processing (screenshots, videos, traces)
+  - Sharding support for parallel execution
+  - Custom metadata injection via environment variables
 
-### 2. Ingestion Layer
+**Configuration**:
+```typescript
+reporter: [
+  ['stanterprise-playwright-reporter', {
+    grpcAddress: 'localhost:50051',
+    grpcMaxRetries: 3,
+    grpcRetryDelay: 100,
+    maxAttachmentSize: 10485760
+  }]
+]
+```
 
-The ingestion layer receives and validates incoming data:
+### 2. Ingestion Service
 
-- **API Gateway**: Entry point for all data ingestion with rate limiting and authentication
-- **Data Collector Service**: Handles high-throughput data ingestion
-- **Data Validation**: Ensures data quality and schema compliance
+The entry point for all test events:
 
-### 3. Processing Layer
+- **Purpose**: Receives and validates test events via gRPC
+- **Port**: 50051 (default, configurable)
+- **Protocol**: gRPC (protobuf-based)
+- **Scalability**: Stateless, horizontally scalable
+- **Features**:
+  - High-throughput event ingestion
+  - Payload validation
+  - Publishes to NATS JetStream
+  - Optional dual-write to database
 
-The processing layer transforms and enriches data:
+**Key characteristics**:
+- No database dependency (stateless)
+- Can scale to handle thousands of concurrent test runs
+- Validates protobuf payloads before publishing
 
-- **Stream Processor**: Real-time data processing using event streaming
-- **Aggregation Engine**: Pre-aggregates metrics for faster queries
-- **Alerting Engine**: Evaluates alert rules and triggers notifications
+**Environment Variables**:
+- `PORT`: gRPC listening port (default: 50051)
+- `NATS_URL`: NATS server URL
+- `NATS_STREAM`: JetStream stream name (default: tests_events)
+- `NATS_SUBJECT_PREFIX`: Subject prefix (default: tests.events.v1)
 
-### 4. Storage Layer
+### 3. NATS JetStream
 
-The storage layer persists data with optimized storage strategies:
+Message streaming platform for event distribution:
 
-- **Time Series Database**: Efficient storage for metrics (Prometheus-compatible)
-- **Document Store**: Structured logs and metadata
-- **Object Storage**: Long-term retention of raw data and traces
+- **Purpose**: Decouples ingestion from processing
+- **Features**:
+  - At-least-once delivery guarantee
+  - Message persistence
+  - Consumer groups for load distribution
+  - Stream replay capabilities
+- **Benefits**:
+  - Enables horizontal scaling
+  - Provides fault tolerance
+  - Allows multiple consumers (processor, WebSocket relay)
 
-### 5. Query Layer
+**Configuration**:
+```yaml
+stream: tests_events
+subjects:
+  - tests.events.v1.>
+retention: workqueue
+```
 
-The query layer provides efficient data access:
+### 4. Processor Service
 
-- **Query API**: RESTful and GraphQL APIs for data access
-- **Query Cache**: In-memory caching for frequently accessed data
-- **Query Optimizer**: Optimizes query execution plans
+Event processor that persists test data:
 
-### 6. Presentation Layer
+- **Purpose**: Consumes events from NATS and persists to MongoDB
+- **Pattern**: Durable consumer with idempotent upsert
+- **Scalability**: Can run multiple instances with consumer groups
+- **Features**:
+  - Idempotent event processing
+  - Database migration handling
+  - Structured test run hierarchy
+  - Automatic retry on failures
 
-The presentation layer provides user interfaces:
+**Data Model**:
+```
+Test Run
+├── Metadata (run ID, timestamp, shard info)
+├── Tests[]
+│   ├── Test ID, name, status
+│   ├── Steps[]
+│   │   └── Step ID, name, duration, status
+│   └── Attachments[]
+│       └── Type, path, content
+└── Summary (counts, durations)
+```
 
-- **Web UI**: Interactive dashboards and visualization
-- **API Server**: RESTful API for programmatic access
-- **CLI Tools**: Command-line interface for automation
+**Environment Variables**:
+- `MONGODB_URI`: MongoDB connection string (required)
+- `NATS_URL`: NATS server URL
+- `NATS_STREAM`: JetStream stream name
+- `NATS_CONSUMER`: Durable consumer name (default: processor)
+
+### 5. API Service
+
+REST/GraphQL API and WebSocket server:
+
+- **Purpose**: Provides data access and real-time streaming
+- **Port**: 8080 (default, configurable)
+- **Protocols**: HTTP, GraphQL, WebSocket
+- **Features**:
+  - REST endpoints for test listing and details
+  - GraphQL API with interactive playground
+  - WebSocket endpoint for real-time event streaming
+  - Read-only database access
+
+**Endpoints**:
+- `GET /api/test-runs` - List test runs
+- `GET /api/test-runs/:id` - Get test run details
+- `GET /api/test-runs/:id/stats` - Get run statistics
+- `POST /graphql` - GraphQL queries
+- `GET /graphql` - GraphQL playground
+- `GET /ws` - WebSocket connection for real-time events
+
+**WebSocket Events**:
+```json
+{
+  "type": "test.begin|test.end|step.begin|step.end",
+  "timestamp": "2026-02-17T03:42:54Z",
+  "data": { /* event-specific data */ }
+}
+```
+
+**Environment Variables**:
+- `PORT`: HTTP listening port (default: 8080)
+- `MONGODB_URI`: MongoDB connection string (required)
+- `NATS_URL`: NATS server URL (optional, for WebSocket)
+- `NATS_STREAM`: JetStream stream name
+- `NATS_WS_CONSUMER`: WebSocket consumer name (default: websocket)
+
+### 6. Web UI
+
+Modern React-based dashboard:
+
+- **Purpose**: Visualize test runs and monitor execution
+- **Technology**: React, TypeScript, Tailwind CSS
+- **Port**: 3000 (development), 80 (production/Nginx)
+- **Features**:
+  - Real-time test execution monitoring
+  - Test run listing with status and timing
+  - Responsive, mobile-friendly design
+  - Environment-based configuration
+
+**Key Views**:
+- Test run list with filters
+- Test run details with step breakdown
+- Real-time execution status
+- Failure analysis
 
 ## Data Flow
 
-1. **Collection**: Agents and collectors send data to the API Gateway
-2. **Ingestion**: Gateway routes data to the Data Collector Service
-3. **Validation**: Data is validated and enriched with metadata
-4. **Processing**: Stream Processor handles real-time processing and aggregation
-5. **Storage**: Processed data is stored in appropriate databases
-6. **Querying**: Users query data through the Query API
-7. **Presentation**: Results are displayed in the Web UI or returned via API
+### Test Execution Flow
+
+1. **Test Start**: Playwright test begins execution
+2. **Event Capture**: Reporter captures test.begin event
+3. **gRPC Send**: Event sent to Ingestion Service via gRPC
+4. **Validation**: Ingestion validates protobuf payload
+5. **Publish**: Event published to NATS JetStream
+6. **Process**: Processor consumes event from NATS
+7. **Persist**: Processor saves to MongoDB
+8. **Stream**: API service relays event via WebSocket
+9. **Display**: Web UI receives WebSocket event and updates UI
+
+### Query Flow
+
+1. **User Request**: User opens Web UI or makes API call
+2. **API Call**: Web UI queries API Service
+3. **Database Query**: API Service queries MongoDB
+4. **Response**: Data returned to Web UI
+5. **Render**: UI displays test run information
+
+## Deployment Modes
+
+### All-in-One (AIO) Mode
+
+Single container with all services embedded:
+
+**Use Cases**:
+- Local development
+- CI/CD environments
+- Quick demos and testing
+
+**Container**:
+```bash
+docker run -d \
+  -p 3000:80 \
+  -p 50051:50051 \
+  -v observer-data:/data \
+  ghcr.io/stanterprise/observer/aio:latest
+```
+
+**Includes**:
+- Ingestion service
+- NATS JetStream (embedded)
+- Processor service
+- API service
+- MongoDB (embedded)
+- Web UI (Nginx)
+
+### Distributed Mode
+
+Separate containers for each service:
+
+**Use Cases**:
+- Production deployments
+- High-scale test environments
+- Multi-tenant setups
+
+**Services**:
+- `observer-ingestion`: gRPC ingestion service
+- `observer-processor`: Event processor
+- `observer-api`: REST/GraphQL/WebSocket API
+- `observer-web`: React UI (Nginx)
+- `mongodb`: Database (external)
+- `nats`: Message broker (external)
+
+**Deployment**:
+```bash
+# Via Helm
+helm install observer oci://ghcr.io/stanterprise/observer/charts/observer
+
+# Via Docker Compose
+docker compose --profile dist up -d
+```
 
 ## Scalability
 
-Observer is designed to scale horizontally:
+Observer scales horizontally at every layer:
 
-- **Stateless Services**: All services are stateless and can be scaled independently
-- **Distributed Processing**: Stream processing distributes load across multiple workers
-- **Sharded Storage**: Data is automatically sharded across storage nodes
-- **Load Balancing**: Built-in load balancing for high availability
+### Ingestion Layer
+- **Stateless**: No local state, can run unlimited replicas
+- **Load Balancing**: Use load balancer or Kubernetes service
+- **Throughput**: Thousands of concurrent connections
 
-## High Availability
+### Processing Layer
+- **Consumer Groups**: Multiple processor instances share workload
+- **Partitioning**: NATS distributes messages across consumers
+- **Idempotency**: Safe to process same event multiple times
 
-Observer ensures high availability through:
+### Storage Layer
+- **MongoDB**: Horizontal scaling via sharding
+- **Indexing**: Optimized indexes for common queries
+- **Retention**: Configurable data retention policies
 
-- **Redundancy**: Multiple replicas of each service
-- **Health Checks**: Automatic health monitoring and failover
-- **Data Replication**: Synchronous and asynchronous replication
-- **Graceful Degradation**: Continues operation with reduced functionality if components fail
-
-## Security
-
-Security is built into every layer:
-
-- **Authentication**: OAuth2, OIDC, and API key authentication
-- **Authorization**: Role-based access control (RBAC)
-- **Encryption**: TLS for data in transit, encryption at rest
-- **Audit Logging**: Comprehensive audit logs for all operations
+### API Layer
+- **Stateless**: Multiple API instances behind load balancer
+- **Caching**: Query result caching for performance
+- **WebSocket**: Each connection handled independently
 
 ## Performance Characteristics
 
-- **Ingestion Rate**: Up to 1M+ events per second per collector node
-- **Query Latency**: Sub-second queries for recent data
-- **Storage Efficiency**: 10:1 compression ratio for metrics
-- **Retention**: Configurable retention policies (default: 30 days for metrics)
+- **Ingestion**: 10,000+ events/second per ingestion node
+- **Processing**: 5,000+ events/second per processor node
+- **Query Latency**: <100ms for recent test runs
+- **WebSocket**: Real-time event delivery (<50ms latency)
+- **Storage**: Efficient document-based storage for test hierarchies
 
 ## Technology Stack
 
-- **Runtime**: Go for core services, React for Web UI
-- **Storage**: PostgreSQL, TimescaleDB, S3-compatible object storage
-- **Messaging**: Apache Kafka for event streaming
-- **Caching**: Redis for query caching
-- **Orchestration**: Kubernetes-native deployment
+- **Language**: Go (services), TypeScript (reporter, Web UI)
+- **Messaging**: NATS JetStream
+- **Database**: MongoDB
+- **API**: REST, GraphQL (gqlgen)
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **Deployment**: Docker, Kubernetes (Helm)
+- **Protocol**: gRPC (protobuf) for ingestion, HTTP/WebSocket for API
+
+## Security Considerations
+
+- **gRPC**: TLS support for encrypted communication
+- **Authentication**: Token-based authentication (roadmap)
+- **Network**: Ingestion and API can be isolated
+- **Database**: Connection encryption and auth
+- **NATS**: TLS and token authentication support
+
+## High Availability
+
+### Data Durability
+- **NATS JetStream**: Persistent message storage
+- **MongoDB**: Replica sets for redundancy
+- **Idempotency**: Safe event replay on failure
+
+### Fault Tolerance
+- **Service Restarts**: Automatic recovery from crashes
+- **Message Replay**: Reprocess missed events
+- **Graceful Degradation**: Continue operation with reduced functionality
+
+## Future Enhancements
+
+- [ ] Remove database from ingestion (fully stateless)
+- [ ] Complete GraphQL API implementation
+- [ ] Object storage for large attachments (S3/MinIO)
+- [ ] Authentication and authorization layer
+- [ ] Metrics export (Prometheus)
+- [ ] Distributed tracing (OpenTelemetry)
 
 ## Next Steps
 
 - [Getting Started](/docs/getting-started/) - Set up Observer
-- [Installation](/docs/install/) - Detailed installation guide
-- [Integrations](/docs/integrations/) - Connect Observer to your stack
-- [Demo](/docs/demo/) - Try Observer with sample data
+- [Installation](/docs/install/) - Deployment guides
+- [Playwright Reporter](/docs/integrations/playwright-reporter/) - Configure the reporter
+- [Demo](/docs/demo/) - Try Observer with examples

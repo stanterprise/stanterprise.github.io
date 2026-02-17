@@ -1,0 +1,27 @@
+{
+  "name": "observer-docs",
+  "version": "1.0.0",
+  "description": "Observer documentation site",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stanterprise/stanterprise.github.io.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/stanterprise/stanterprise.github.io/issues"
+  },
+  "homepage": "https://github.com/stanterprise/stanterprise.github.io#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "postcss-cli": "^11.0.0"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.2",
+    "@fortawesome/fontawesome-free": "^6.5.1"
+  }
+}

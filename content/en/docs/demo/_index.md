@@ -20,6 +20,8 @@ Visit our live demo: [https://demo.observer.io](https://demo.observer.io)
 - Username: `demo@observer.io`
 - Password: `demo123`
 
+> **Note**: These are intentionally simple credentials for demo purposes only. Never use such simple passwords in production environments.
+
 The demo environment includes:
 - Pre-populated sample data from various sources
 - Multiple dashboards showing different use cases

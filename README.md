@@ -12,9 +12,11 @@ This repository contains the documentation website for Observer, a comprehensive
 
 ### Prerequisites
 
-- [Hugo Extended](https://gohugo.io/installation/) (v0.121.1 or later)
-- [Go](https://golang.org/dl/) (v1.21 or later)
-- [Node.js](https://nodejs.org/) (v18 or later)
+- [Hugo Extended](https://gohugo.io/installation/) v0.121.1 or later (Extended version required for SCSS support)
+- [Go](https://golang.org/dl/) v1.21 or later
+- [Node.js](https://nodejs.org/) v18 or later
+
+> **Note**: The GitHub Actions workflow uses Hugo v0.121.1. For consistency, it's recommended to use the same version for local development.
 
 ### Setup
 

@@ -52,7 +52,7 @@ params:
   privacy_policy: ""
   # GitHub repo configuration for "Edit this page" links
   github_repo: https://github.com/stanterprise/stanterprise.github.io
-  github_branch: main
+  github_branch: master
   # Enable "Edit this page" link
   github_project_repo: https://github.com/stanterprise/stanterprise.github.io
   # UI customization

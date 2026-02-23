@@ -51,7 +51,7 @@ The generated site will be in the `public/` directory.
 
 ## Deployment
 
-The site is automatically deployed to GitHub Pages when changes are pushed to the `main` branch via GitHub Actions.
+The site is automatically deployed to GitHub Pages when changes are pushed to the `master` branch via GitHub Actions.
 
 ## Content Structure
 

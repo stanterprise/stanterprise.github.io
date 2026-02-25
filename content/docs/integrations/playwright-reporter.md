@@ -1,12 +1,12 @@
 ---
 title: Playwright Reporter
 weight: 1
-description: Configure and use the stanterprise-playwright-reporter for test observability
+description: Configure and use the @stanterprise/playwright-reporter for test observability
 ---
 
 # Playwright Reporter Integration
 
-The `stanterprise-playwright-reporter` is a custom Playwright test reporter that sends test execution events to Observer via gRPC, enabling real-time test monitoring and comprehensive test analytics.
+The `@stanterprise/playwright-reporter` is a custom Playwright test reporter that sends test execution events to Observer via gRPC, enabling real-time test monitoring and comprehensive test analytics.
 
 ## Features
 
@@ -22,7 +22,7 @@ The `stanterprise-playwright-reporter` is a custom Playwright test reporter that
 ## Installation
 
 ```bash
-npm install stanterprise-playwright-reporter --save-dev
+npm install @stanterprise/playwright-reporter --save-dev
 ```
 
 ## Basic Configuration
@@ -30,12 +30,12 @@ npm install stanterprise-playwright-reporter --save-dev
 Add the reporter to your `playwright.config.ts`:
 
 ```typescript
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   reporter: [
-    ['list'], // Keep console output
-    ['stanterprise-playwright-reporter']
+    ["list"], // Keep console output
+    ["@stanterprise/playwright-reporter"],
   ],
   // ... other config
 });
@@ -46,36 +46,39 @@ export default defineConfig({
 ### Configuration Options
 
 ```typescript
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   reporter: [
-    ['stanterprise-playwright-reporter', {
-      grpcAddress: 'localhost:50051',      // Observer gRPC server address
-      grpcEnabled: true,                    // Enable/disable reporting
-      grpcTimeout: 1000,                    // Timeout for gRPC calls (ms)
-      grpcMaxMessageSize: 104857600,        // Max message size (100MB)
-      maxAttachmentSize: 10485760,          // Max attachment size (10MB)
-      grpcMaxRetries: 3,                    // Max retry attempts
-      grpcRetryDelay: 100,                  // Initial retry delay (ms)
-      verbose: false                        // Enable verbose logging
-    }]
+    [
+      "@stanterprise/playwright-reporter",
+      {
+        grpcAddress: "localhost:50051", // Observer gRPC server address
+        grpcEnabled: true, // Enable/disable reporting
+        grpcTimeout: 1000, // Timeout for gRPC calls (ms)
+        grpcMaxMessageSize: 104857600, // Max message size (100MB)
+        maxAttachmentSize: 10485760, // Max attachment size (10MB)
+        grpcMaxRetries: 3, // Max retry attempts
+        grpcRetryDelay: 100, // Initial retry delay (ms)
+        verbose: false, // Enable verbose logging
+      },
+    ],
   ],
 });
 ```
 
 ### Configuration Table
 
-| Option               | Type    | Default           | Description                                         |
-|---------------------|---------|-------------------|-----------------------------------------------------|
-| `grpcAddress`       | string  | `localhost:50051` | Observer gRPC server address                        |
-| `grpcEnabled`       | boolean | `true`            | Enable/disable gRPC reporting                       |
-| `grpcTimeout`       | number  | `1000`            | Timeout for gRPC calls in milliseconds             |
-| `grpcMaxMessageSize`| number  | `104857600`       | Max message size in bytes (100MB)                  |
-| `maxAttachmentSize` | number  | `10485760`        | Max attachment content size (10MB)                 |
-| `grpcMaxRetries`    | number  | `3`               | Maximum retry attempts for failed calls            |
-| `grpcRetryDelay`    | number  | `100`             | Initial delay for retries (exponential backoff)    |
-| `verbose`           | boolean | `false`           | Enable verbose logging                             |
+| Option               | Type    | Default           | Description                                     |
+| -------------------- | ------- | ----------------- | ----------------------------------------------- |
+| `grpcAddress`        | string  | `localhost:50051` | Observer gRPC server address                    |
+| `grpcEnabled`        | boolean | `true`            | Enable/disable gRPC reporting                   |
+| `grpcTimeout`        | number  | `1000`            | Timeout for gRPC calls in milliseconds          |
+| `grpcMaxMessageSize` | number  | `104857600`       | Max message size in bytes (100MB)               |
+| `maxAttachmentSize`  | number  | `10485760`        | Max attachment content size (10MB)              |
+| `grpcMaxRetries`     | number  | `3`               | Maximum retry attempts for failed calls         |
+| `grpcRetryDelay`     | number  | `100`             | Initial delay for retries (exponential backoff) |
+| `verbose`            | boolean | `false`           | Enable verbose logging                          |
 
 ## Environment Variables
 
@@ -98,6 +101,7 @@ STANTERPRISE_META_CI_PIPELINE=github-actions
 Any environment variable with the `STANTERPRISE_META_` prefix is automatically included in test run metadata. The prefix is stripped from the key name.
 
 Examples:
+
 - `STANTERPRISE_META_BUILD_ID=12345` → `BUILD_ID: 12345`
 - `STANTERPRISE_META_BRANCH=main` → `BRANCH: main`
 - `STANTERPRISE_META_COMMIT_SHA=abc123` → `COMMIT_SHA: abc123`
@@ -107,12 +111,14 @@ Examples:
 The reporter automatically retries failed gRPC calls for transient errors using exponential backoff:
 
 **Retryable errors:**
+
 - `UNAVAILABLE` - Server temporarily unavailable
 - `DEADLINE_EXCEEDED` - Request timeout
 - `INTERNAL` - Internal server error
 - `UNKNOWN` - Unknown error
 
 **Non-retryable errors:**
+
 - `INVALID_ARGUMENT` - Bad request format
 - `NOT_FOUND` - Resource not found
 - `PERMISSION_DENIED` - Access denied
@@ -122,16 +128,17 @@ The reporter automatically retries failed gRPC calls for transient errors using 
 **Exponential backoff formula:** `grpcRetryDelay * (2 ^ attemptNumber)`
 
 With default settings (`grpcRetryDelay: 100`, `grpcMaxRetries: 3`):
+
 - Initial attempt: Immediate
-- Retry 1: Wait 100ms (100 * 2^0)
-- Retry 2: Wait 200ms (100 * 2^1)
-- Retry 3: Wait 400ms (100 * 2^2)
+- Retry 1: Wait 100ms (100 \* 2^0)
+- Retry 2: Wait 200ms (100 \* 2^1)
+- Retry 3: Wait 400ms (100 \* 2^2)
 
 To disable retries:
 
 ```typescript
 {
-  grpcMaxRetries: 0  // No retries, fail fast
+  grpcMaxRetries: 0; // No retries, fail fast
 }
 ```
 
@@ -146,7 +153,7 @@ In `playwright.config.ts`:
 ```typescript
 export default defineConfig({
   shard: { total: 5, current: 1 },
-  reporter: [['stanterprise-playwright-reporter']],
+  reporter: [["@stanterprise/playwright-reporter"]],
 });
 ```
 
@@ -205,6 +212,7 @@ Without a shared run ID, each shard creates a separate test run instead of aggre
 ### Attachments
 
 The reporter automatically processes and sends:
+
 - Screenshots
 - Videos
 - Trace files
@@ -213,6 +221,7 @@ The reporter automatically processes and sends:
 ### Test Run Metadata
 
 Automatically collected metadata includes:
+
 - Run ID (auto-generated or custom via `STANTERPRISE_RUN_ID`)
 - Test count
 - Start time
@@ -225,17 +234,14 @@ Automatically collected metadata includes:
 
 ```typescript
 // playwright.config.ts
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   use: {
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
   },
-  reporter: [
-    ['list'],
-    ['stanterprise-playwright-reporter']
-  ],
+  reporter: [["list"], ["@stanterprise/playwright-reporter"]],
 });
 ```
 
@@ -243,16 +249,19 @@ export default defineConfig({
 
 ```typescript
 // playwright.config.ts
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   reporter: [
-    ['list'],
-    ['stanterprise-playwright-reporter', {
-      grpcAddress: process.env.OBSERVER_GRPC_ADDRESS || 'localhost:50051',
-      verbose: process.env.CI === 'true',
-      grpcMaxRetries: 5,  // More retries in CI
-    }]
+    ["list"],
+    [
+      "@stanterprise/playwright-reporter",
+      {
+        grpcAddress: process.env.OBSERVER_GRPC_ADDRESS || "localhost:50051",
+        verbose: process.env.CI === "true",
+        grpcMaxRetries: 5, // More retries in CI
+      },
+    ],
   ],
 });
 ```
@@ -270,11 +279,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
-      
+          node-version: "18"
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run Playwright tests
         env:
           STANTERPRISE_GRPC_ADDRESS: observer.example.com:50051
@@ -299,10 +308,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run Playwright tests
         env:
           STANTERPRISE_GRPC_ADDRESS: observer.example.com:50051
@@ -320,6 +329,7 @@ This error typically occurs due to large attachments exceeding message size limi
 **Solutions:**
 
 1. **Increase message size limits**:
+
    ```typescript
    {
      grpcMaxMessageSize: 104857600, // 100MB
@@ -328,6 +338,7 @@ This error typically occurs due to large attachments exceeding message size limi
    ```
 
 2. **Reduce attachment sizes** by saving to disk:
+
    ```typescript
    use: {
      screenshot: 'only-on-failure',
@@ -338,7 +349,9 @@ This error typically occurs due to large attachments exceeding message size limi
 
 3. **Enable verbose logging** to monitor sizes:
    ```typescript
-   { verbose: true }
+   {
+     verbose: true;
+   }
    ```
 
 ### Connection Issues
@@ -364,7 +377,7 @@ import type {
   StanterpriseReporterOptions,
   TestExecutionContext,
   StepExecutionContext,
-} from 'stanterprise-playwright-reporter';
+} from "@stanterprise/playwright-reporter";
 ```
 
 ## Next Steps

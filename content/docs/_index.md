@@ -45,10 +45,12 @@ Observer is built on a modern, event-driven architecture:
 ## Quick Links
 
 ### For Developers
+
 - [Playwright Reporter Configuration](/docs/integrations/playwright-reporter/) - Configure the reporter in your tests
 - [CI/CD Integration](/docs/integrations/#cicd-integrations) - Integrate with GitHub Actions, GitLab CI, Jenkins
 
 ### For DevOps
+
 - [Docker Deployment](/docs/install/) - Run Observer with Docker
 - [Kubernetes/Helm](/docs/install/) - Deploy Observer on Kubernetes
 - [Configuration](/docs/integrations/#observer-configuration) - Configure Observer services
@@ -57,7 +59,7 @@ Observer is built on a modern, event-driven architecture:
 
 - **Observer**: [github.com/stanterprise/observer](https://github.com/stanterprise/observer)
 - **Playwright Reporter**: [github.com/stanterprise/stanterprise-playwright-reporter](https://github.com/stanterprise/stanterprise-playwright-reporter)
-- **NPM Package**: [npmjs.com/package/stanterprise-playwright-reporter](https://www.npmjs.com/package/stanterprise-playwright-reporter)
+- **NPM Package**: [npmjs.com/package/@stanterprise/playwright-reporter](https://www.npmjs.com/package/@stanterprise/playwright-reporter)
 
 ## Support
 

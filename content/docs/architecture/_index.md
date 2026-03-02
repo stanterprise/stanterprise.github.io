@@ -14,7 +14,7 @@ Observer is built on a modern, event-driven architecture designed for scalabilit
 graph TB
     subgraph "Test Execution"
         A[Playwright Tests]
-        B[stanterprise-playwright-reporter]
+        B[@stanterprise/playwright-reporter]
     end
     
     subgraph "Ingestion Layer"
@@ -61,7 +61,7 @@ graph TB
 
 ## Core Components
 
-### 1. Playwright Reporter (stanterprise-playwright-reporter)
+### 1. Playwright Reporter (@stanterprise/playwright-reporter)
 
 The test client that integrates with Playwright test framework:
 
@@ -78,7 +78,7 @@ The test client that integrates with Playwright test framework:
 **Configuration**:
 ```typescript
 reporter: [
-  ['stanterprise-playwright-reporter', {
+  ['@stanterprise/playwright-reporter', {
     grpcAddress: 'localhost:50051',
     grpcMaxRetries: 3,
     grpcRetryDelay: 100,

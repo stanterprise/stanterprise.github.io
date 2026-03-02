@@ -390,4 +390,4 @@ import type {
 
 - [Reporter GitHub Repository](https://github.com/stanterprise/stanterprise-playwright-reporter)
 - [Observer GitHub Repository](https://github.com/stanterprise/observer)
-- [NPM Package](https://www.npmjs.com/package/stanterprise-playwright-reporter)
+- [NPM Package](https://www.npmjs.com/package/@stanterprise/playwright-reporter)

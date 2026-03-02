@@ -12,29 +12,33 @@ Observer integrates with your test frameworks to provide comprehensive test obse
 
 ### Playwright Reporter
 
-The primary way to integrate Observer with your tests is through the **stanterprise-playwright-reporter**. This custom reporter sends test execution events to Observer in real-time.
+The primary way to integrate Observer with your tests is through the **@stanterprise/playwright-reporter**. This custom reporter sends test execution events to Observer in real-time.
 
 **Quick Setup:**
 
 ```bash
-npm install stanterprise-playwright-reporter --save-dev
+npm install @stanterprise/playwright-reporter --save-dev
 ```
 
 ```typescript
 // playwright.config.ts
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   reporter: [
-    ['list'],
-    ['stanterprise-playwright-reporter', {
-      grpcAddress: 'localhost:50051'
-    }]
+    ["list"],
+    [
+      "@stanterprise/playwright-reporter",
+      {
+        grpcAddress: "localhost:50051",
+      },
+    ],
   ],
 });
 ```
 
 **Key Features:**
+
 - Real-time test event streaming
 - Step-by-step execution tracking
 - Automatic attachment handling (screenshots, videos, traces)
@@ -61,11 +65,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
-      
+          node-version: "18"
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run Playwright tests
         env:
           STANTERPRISE_GRPC_ADDRESS: observer.example.com:50051
@@ -99,13 +103,13 @@ Use Observer in Jenkins pipelines:
 ```groovy
 pipeline {
     agent any
-    
+
     environment {
         STANTERPRISE_GRPC_ADDRESS = 'observer.example.com:50051'
         STANTERPRISE_META_BUILD_ID = "${BUILD_ID}"
         STANTERPRISE_META_BRANCH = "${GIT_BRANCH}"
     }
-    
+
     stages {
         stage('Test') {
             steps {
@@ -149,7 +153,7 @@ kubectl port-forward svc/observer-ingestion 50051:50051
 Use Docker Compose for local development:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   observer:
     image: ghcr.io/stanterprise/observer/aio:latest
@@ -212,14 +216,17 @@ Control reporter behavior through environment variables:
 Configure Observer services:
 
 **Ingestion Service:**
+
 - `PORT`: gRPC listening port (default: `50051`)
 - `NATS_URL`: NATS server URL
 
 **Processor Service:**
+
 - `MONGODB_URI`: MongoDB connection string
 - `NATS_URL`: NATS server URL
 
 **API Service:**
+
 - `PORT`: HTTP listening port (default: `8080`)
 - `MONGODB_URI`: MongoDB connection string
 - `NATS_URL`: NATS server URL for WebSocket streaming

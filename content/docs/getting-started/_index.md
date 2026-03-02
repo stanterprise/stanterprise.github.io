@@ -32,6 +32,7 @@ docker run -d \
 ```
 
 This starts Observer with:
+
 - Web UI on port 3000 (http://localhost:3000)
 - gRPC endpoint on port 50051
 
@@ -40,7 +41,7 @@ This starts Observer with:
 In your Playwright project, install the Observer reporter:
 
 ```bash
-npm install stanterprise-playwright-reporter --save-dev
+npm install @stanterprise/playwright-reporter --save-dev
 ```
 
 ### 3. Configure Playwright
@@ -48,15 +49,18 @@ npm install stanterprise-playwright-reporter --save-dev
 Add the reporter to your `playwright.config.ts`:
 
 ```typescript
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   reporter: [
-    ['list'], // Keep the default console reporter
-    ['stanterprise-playwright-reporter', {
-      grpcAddress: 'localhost:50051',
-      verbose: true
-    }]
+    ["list"], // Keep the default console reporter
+    [
+      "@stanterprise/playwright-reporter",
+      {
+        grpcAddress: "localhost:50051",
+        verbose: true,
+      },
+    ],
   ],
   // ... your other config
 });

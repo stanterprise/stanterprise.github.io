@@ -16,32 +16,32 @@ graph TB
         A[Playwright Tests]
         B[@stanterprise/playwright-reporter]
     end
-    
+
     subgraph "Ingestion Layer"
         C[Ingestion Service<br/>gRPC Port 50051]
     end
-    
+
     subgraph "Message Streaming"
         D[NATS JetStream<br/>Event Bus]
     end
-    
+
     subgraph "Processing Layer"
         E[Processor Service<br/>Event Consumer]
     end
-    
+
     subgraph "Storage Layer"
         F[(MongoDB<br/>Test Data)]
     end
-    
+
     subgraph "API Layer"
         G[API Service<br/>REST/GraphQL/WebSocket]
     end
-    
+
     subgraph "Presentation Layer"
         H[Web UI<br/>React Dashboard]
         I[WebSocket<br/>Real-Time Updates]
     end
-    
+
     A --> B
     B -->|Test Events<br/>gRPC| C
     C -->|Publish| D
@@ -52,7 +52,7 @@ graph TB
     G -->|HTTP/GraphQL| H
     G -.->|WebSocket| I
     I --> H
-    
+
     style C fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
     style D fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
     style E fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
@@ -76,15 +76,19 @@ The test client that integrates with Playwright test framework:
   - Custom metadata injection via environment variables
 
 **Configuration**:
+
 ```typescript
 reporter: [
-  ['@stanterprise/playwright-reporter', {
-    grpcAddress: 'localhost:50051',
-    grpcMaxRetries: 3,
-    grpcRetryDelay: 100,
-    maxAttachmentSize: 10485760
-  }]
-]
+  [
+    "@stanterprise/playwright-reporter",
+    {
+      grpcAddress: "localhost:50051",
+      grpcMaxRetries: 3,
+      grpcRetryDelay: 100,
+      maxAttachmentSize: 10485760,
+    },
+  ],
+];
 ```
 
 ### 2. Ingestion Service
@@ -102,11 +106,13 @@ The entry point for all test events:
   - Optional dual-write to database
 
 **Key characteristics**:
+
 - No database dependency (stateless)
 - Can scale to handle thousands of concurrent test runs
 - Validates protobuf payloads before publishing
 
 **Environment Variables**:
+
 - `PORT`: gRPC listening port (default: 50051)
 - `NATS_URL`: NATS server URL
 - `NATS_STREAM`: JetStream stream name (default: tests_events)
@@ -128,6 +134,7 @@ Message streaming platform for event distribution:
   - Allows multiple consumers (processor, WebSocket relay)
 
 **Configuration**:
+
 ```yaml
 stream: tests_events
 subjects:
@@ -149,6 +156,7 @@ Event processor that persists test data:
   - Automatic retry on failures
 
 **Data Model**:
+
 ```
 Test Run
 ├── Metadata (run ID, timestamp, shard info)
@@ -162,6 +170,7 @@ Test Run
 ```
 
 **Environment Variables**:
+
 - `MONGODB_URI`: MongoDB connection string (required)
 - `NATS_URL`: NATS server URL
 - `NATS_STREAM`: JetStream stream name
@@ -181,23 +190,29 @@ REST/GraphQL API and WebSocket server:
   - Read-only database access
 
 **Endpoints**:
-- `GET /api/test-runs` - List test runs
-- `GET /api/test-runs/:id` - Get test run details
-- `GET /api/test-runs/:id/stats` - Get run statistics
+
+- `GET /api/tests` - List test runs
+- `GET /api/tests/:id` - Get test run details
+- `GET /api/tests/:id/stats` - Get run statistics
+- `GET /api/tests/:id/trends` - Get test run trends
 - `POST /graphql` - GraphQL queries
 - `GET /graphql` - GraphQL playground
 - `GET /ws` - WebSocket connection for real-time events
 
 **WebSocket Events**:
+
 ```json
 {
   "type": "test.begin|test.end|step.begin|step.end",
   "timestamp": "2026-02-17T03:42:54Z",
-  "data": { /* event-specific data */ }
+  "data": {
+    /* event-specific data */
+  }
 }
 ```
 
 **Environment Variables**:
+
 - `PORT`: HTTP listening port (default: 8080)
 - `MONGODB_URI`: MongoDB connection string (required)
 - `NATS_URL`: NATS server URL (optional, for WebSocket)
@@ -218,6 +233,7 @@ Modern React-based dashboard:
   - Environment-based configuration
 
 **Key Views**:
+
 - Test run list with filters
 - Test run details with step breakdown
 - Real-time execution status
@@ -252,11 +268,13 @@ Modern React-based dashboard:
 Single container with all services embedded:
 
 **Use Cases**:
+
 - Local development
 - CI/CD environments
 - Quick demos and testing
 
 **Container**:
+
 ```bash
 docker run -d \
   -p 3000:80 \
@@ -266,6 +284,7 @@ docker run -d \
 ```
 
 **Includes**:
+
 - Ingestion service
 - NATS JetStream (embedded)
 - Processor service
@@ -278,11 +297,13 @@ docker run -d \
 Separate containers for each service:
 
 **Use Cases**:
+
 - Production deployments
 - High-scale test environments
 - Multi-tenant setups
 
 **Services**:
+
 - `observer-ingestion`: gRPC ingestion service
 - `observer-processor`: Event processor
 - `observer-api`: REST/GraphQL/WebSocket API
@@ -291,6 +312,7 @@ Separate containers for each service:
 - `nats`: Message broker (external)
 
 **Deployment**:
+
 ```bash
 # Via Helm
 helm install observer oci://ghcr.io/stanterprise/observer/charts/observer
@@ -304,21 +326,25 @@ docker compose --profile dist up -d
 Observer scales horizontally at every layer:
 
 ### Ingestion Layer
+
 - **Stateless**: No local state, can run unlimited replicas
 - **Load Balancing**: Use load balancer or Kubernetes service
 - **Throughput**: Thousands of concurrent connections
 
 ### Processing Layer
+
 - **Consumer Groups**: Multiple processor instances share workload
 - **Partitioning**: NATS distributes messages across consumers
 - **Idempotency**: Safe to process same event multiple times
 
 ### Storage Layer
+
 - **MongoDB**: Horizontal scaling via sharding
 - **Indexing**: Optimized indexes for common queries
 - **Retention**: Configurable data retention policies
 
 ### API Layer
+
 - **Stateless**: Multiple API instances behind load balancer
 - **Caching**: Query result caching for performance
 - **WebSocket**: Each connection handled independently
@@ -352,11 +378,13 @@ Observer scales horizontally at every layer:
 ## High Availability
 
 ### Data Durability
+
 - **NATS JetStream**: Persistent message storage
 - **MongoDB**: Replica sets for redundancy
 - **Idempotency**: Safe event replay on failure
 
 ### Fault Tolerance
+
 - **Service Restarts**: Automatic recovery from crashes
 - **Message Replay**: Reprocess missed events
 - **Graceful Degradation**: Continue operation with reduced functionality

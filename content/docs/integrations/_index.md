@@ -141,10 +141,9 @@ docker run -d \
 Deploy Observer on Kubernetes using Helm:
 
 ```bash
-# Add Helm repository
 helm install observer oci://ghcr.io/stanterprise/observer/charts/observer --version 0.1.0
 
-# Create service for test clients
+# Forward ingestion service for local test clients
 kubectl port-forward svc/observer-ingestion 50051:50051
 ```
 
@@ -197,9 +196,10 @@ Observer is built on a distributed architecture:
 
 - **Ingestion Service**: Receives gRPC test events from the Playwright reporter
 - **NATS JetStream**: Message broker for event streaming
-- **Processor Service**: Processes and persists test events
-- **API Service**: Provides REST/GraphQL API and WebSocket streaming
+- **Processor Service**: Processes events and persists canonical run data to PostgreSQL
+- **API Service**: Provides REST API and WebSocket streaming
 - **Web UI**: React-based dashboard for visualizing test runs
+- **MongoDB**: Used only for in-flight live step buffering
 
 ## Configuration
 
@@ -222,13 +222,14 @@ Configure Observer services:
 
 **Processor Service:**
 
+- `POSTGRES_DSN` or `DATABASE_URL`: PostgreSQL connection string (primary persistence)
 - `MONGODB_URI`: MongoDB connection string
 - `NATS_URL`: NATS server URL
 
 **API Service:**
 
 - `PORT`: HTTP listening port (default: `8080`)
-- `MONGODB_URI`: MongoDB connection string
+- `POSTGRES_DSN` or `DATABASE_URL`: PostgreSQL connection string (required for REST)
 - `NATS_URL`: NATS server URL for WebSocket streaming
 
 ## Next Steps

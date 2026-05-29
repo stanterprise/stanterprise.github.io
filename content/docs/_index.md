@@ -1,32 +1,30 @@
 ---
 title: Documentation
 linkTitle: Docs
-menu:
-  main:
-    weight: 20
 ---
 
 # Observer Documentation
 
-Welcome to the Observer documentation! Observer is a test observability system that collects and visualizes test execution events in real-time. Here you'll find everything you need to get started with Observer and integrate it with your Playwright tests.
+Welcome to the Observer documentation. Observer is a test observability system for Playwright pipelines that ingests execution events over gRPC, processes them through NATS JetStream, and exposes run data through a REST API and Web UI.
 
 ## Getting Started
 
 New to Observer? Start here:
 
 - [Getting Started Guide](/docs/getting-started/) - Quick start guide to get Observer up and running
-- [Installation](/docs/install/) - Detailed installation instructions for Docker, Kubernetes, and local development
+- [Installation](/docs/install/) - Deployment instructions for Docker and Kubernetes/Helm
 - [Architecture](/docs/architecture/) - Understanding Observer's distributed architecture
 - [Integrations](/docs/integrations/) - Connect Observer with Playwright and your CI/CD pipeline
 - [Playwright Reporter](/docs/integrations/playwright-reporter/) - Detailed guide for the Playwright reporter
-- [Demo](/docs/demo/) - Try Observer with sample applications
+- [Demo](/docs/demo/) - Run a realistic local demo flow with Playwright
+- [Roadmap](/docs/roadmap/) - Planning scaffold for upcoming Observer milestones
 
 ## Key Features
 
 Observer provides comprehensive test observability for modern CI/CD pipelines:
 
 - **Real-Time Test Monitoring**: Track test execution in real-time with WebSocket streaming
-- **Test Analytics**: Analyze test performance, failure patterns, and execution trends
+- **Run and Test Analytics**: Inspect run-level status, test outcomes, and trends
 - **Step-by-Step Tracking**: Monitor individual test steps with timing and status information
 - **Attachment Management**: Automatically handle screenshots, videos, and trace files
 - **Sharding Support**: Aggregate results from parallel test execution
@@ -38,9 +36,10 @@ Observer is built on a modern, event-driven architecture:
 
 - **Ingestion Service**: gRPC endpoint for receiving test events
 - **NATS JetStream**: Message broker for reliable event streaming
-- **Processor Service**: Processes and persists events to MongoDB
-- **API Service**: Provides REST/GraphQL API and WebSocket streaming
+- **Processor Service**: Consumes events and persists durable run data to PostgreSQL
+- **API Service**: Provides REST endpoints and WebSocket streaming
 - **Web UI**: React-based dashboard for visualizing test runs
+- **MongoDB (limited scope)**: Live in-flight step buffering only
 
 ## Quick Links
 
@@ -53,7 +52,7 @@ Observer is built on a modern, event-driven architecture:
 
 - [Docker Deployment](/docs/install/) - Run Observer with Docker
 - [Kubernetes/Helm](/docs/install/) - Deploy Observer on Kubernetes
-- [Configuration](/docs/integrations/#observer-configuration) - Configure Observer services
+- [Configuration](/docs/integrations/#observer-configuration) - Configure reporter and services
 
 ## Repositories
 

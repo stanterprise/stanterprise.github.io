@@ -6,203 +6,114 @@ description: Detailed installation instructions for Observer
 
 # Installing Observer
 
-Observer can be installed in multiple ways to suit your environment and requirements.
+Observer can run in two deployment styles:
+
+- **All-in-One (AIO)**: single container for local development and lightweight CI usage
+- **Distributed**: separate services for ingestion, processor, API, web, and infrastructure
 
 ## Installation Methods
 
-Choose the installation method that best fits your needs:
+Choose the method that best matches your environment.
 
-### Kubernetes (Recommended)
+### 1. Docker (AIO)
 
-Observer is designed to run on Kubernetes and provides the best experience in this environment.
-
-#### Using Helm
-
-The recommended way to install Observer on Kubernetes:
+Fastest way to run Observer locally:
 
 ```bash
-# Add repository
-helm repo add observer https://charts.observer.io
-helm repo update
-
-# Install with default values
-helm install observer observer/observer \
-  --namespace observer \
-  --create-namespace
-
-# Or install with custom values
-helm install observer observer/observer \
-  --namespace observer \
-  --create-namespace \
-  --values custom-values.yaml
-```
-
-#### Using kubectl
-
-You can also install using raw Kubernetes manifests:
-
-```bash
-# Apply the manifests
-kubectl apply -f https://raw.githubusercontent.com/observer/observer/main/deploy/kubernetes/observer.yaml
-```
-
-### Docker
-
-For local development or testing:
-
-```bash
-# Run Observer with Docker Compose
-docker-compose up -d
-
-# Or run individual containers
 docker run -d \
   --name observer \
-  -p 8080:8080 \
-  observer/observer:latest
+  -p 3000:80 \
+  -p 50051:50051 \
+  -p 5432:5432 \
+  -v observer-data:/data \
+  ghcr.io/stanterprise/observer/aio:latest
 ```
 
-### Binary Installation
+This exposes:
 
-For non-containerized environments:
+- Web UI: http://localhost:3000
+- gRPC ingestion: localhost:50051
+- PostgreSQL (for local inspection): localhost:5432
+
+### 2. Kubernetes with Helm
+
+Deploy from the OCI chart:
 
 ```bash
-# Download the latest release
-curl -LO https://github.com/observer/observer/releases/latest/download/observer-linux-amd64
+helm install observer oci://ghcr.io/stanterprise/observer/charts/observer --version 0.1.0
 
-# Make it executable
-chmod +x observer-linux-amd64
+# Optional local access during testing
+kubectl port-forward svc/observer-web 3000:80
+kubectl port-forward svc/observer-ingestion 50051:50051
+```
 
-# Move to PATH
-sudo mv observer-linux-amd64 /usr/local/bin/observer
+### 3. Distributed Docker Compose
 
-# Run Observer
-observer start
+For local multi-service testing:
+
+```bash
+docker compose --profile dist up -d
 ```
 
 ## Configuration
 
-### Basic Configuration
+### Ingestion service
 
-Create a configuration file `observer.yaml`:
+- `PORT` (default `50051`)
+- `NATS_URL`
+- `NATS_STREAM`
+- `NATS_SUBJECT_PREFIX`
 
-```yaml
-# Server configuration
-server:
-  port: 8080
-  host: 0.0.0.0
+### Processor service
 
-# Storage configuration
-storage:
-  type: postgresql
-  connection: postgres://user:pass@localhost/observer
+- `POSTGRES_DSN` or `DATABASE_URL` (primary persistence)
+- `MONGODB_URI` or `MONGO_URI` (live step buffering)
+- `NATS_URL`, `NATS_STREAM`, `NATS_CONSUMER`
 
-# Data retention
-retention:
-  metrics: 30d
-  traces: 7d
-  logs: 14d
-```
+### API service
 
-### Advanced Configuration
-
-For production deployments, consider:
-
-- **High Availability**: Run multiple replicas
-- **Resource Limits**: Set appropriate CPU/memory limits
-- **Security**: Enable TLS and authentication
-- **Backup**: Configure regular backups
-
-Example production `values.yaml` for Helm:
-
-```yaml
-replicaCount: 3
-
-resources:
-  limits:
-    cpu: 2000m
-    memory: 4Gi
-  requests:
-    cpu: 500m
-    memory: 1Gi
-
-persistence:
-  enabled: true
-  size: 100Gi
-
-ingress:
-  enabled: true
-  hosts:
-    - host: observer.example.com
-      paths:
-        - /
-  tls:
-    - secretName: observer-tls
-      hosts:
-        - observer.example.com
-```
+- `PORT` (default `8080`)
+- `POSTGRES_DSN` or `DATABASE_URL` (required for REST reads)
+- `NATS_URL`, `NATS_STREAM`, `NATS_WS_CONSUMER` (WebSocket relay)
 
 ## Verification
 
 After installation, verify Observer is running:
 
 ```bash
-# Check pod status (Kubernetes)
-kubectl get pods -n observer
-
-# Check container status (Docker)
+# Docker/AIO
 docker ps | grep observer
 
-# Check service status (Binary)
-systemctl status observer
-```
+# Kubernetes
+kubectl get pods
 
-## Upgrading
-
-To upgrade to a new version:
-
-```bash
-# Helm
-helm upgrade observer observer/observer \
-  --namespace observer
-
-# Docker
-docker pull observer/observer:latest
-docker-compose restart
-
-# Binary
-curl -LO https://github.com/observer/observer/releases/latest/download/observer-linux-amd64
-sudo mv observer-linux-amd64 /usr/local/bin/observer
-systemctl restart observer
+# API health endpoint
+curl http://localhost:8080/health
 ```
 
 ## Troubleshooting
 
-### Pods Not Starting
+### AIO container is up but no events appear
 
-Check pod logs:
+- Confirm reporter points to `localhost:50051`
+- Confirm tests are running with `@stanterprise/playwright-reporter`
 
 ```bash
-kubectl logs -n observer <pod-name>
+docker logs observer
 ```
 
-### Connection Issues
+### API has no data in distributed mode
 
-Verify network policies and service configurations:
-
-```bash
-kubectl describe service -n observer observer-api
-```
-
-### Performance Issues
-
-Monitor resource usage:
+- Verify processor has PostgreSQL and NATS connectivity
+- Verify API has PostgreSQL connectivity
 
 ```bash
-kubectl top pods -n observer
+docker compose logs processor
+docker compose logs api
 ```
 
 ## Next Steps
 
 - [Architecture Overview](/docs/architecture/) - Understand Observer's components
 - [Getting Started](/docs/getting-started/) - Quick start guide
-- [Integrations](/docs/integrations/) - Connect to your data sources
+- [Integrations](/docs/integrations/) - Connect Playwright and CI pipelines

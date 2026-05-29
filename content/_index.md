@@ -14,7 +14,7 @@ GitHub <i class="fab fa-github ms-2 "></i>
 {{< /blocks/cover >}}
 
 {{% blocks/lead color="primary" %}}
-Observer is a test observability system that collects test execution events via gRPC, providing real-time insights into your test runs.
+Observer is a test observability system that collects test execution events, providing real-time insights into your test runs.
 Built for modern CI/CD pipelines, Observer helps teams understand test performance, track failures, and optimize test execution.
 {{% /blocks/lead %}}
 
@@ -24,7 +24,7 @@ Track test execution in real-time with WebSocket streaming and comprehensive das
 {{% /blocks/feature %}}
 
 {{% blocks/feature icon="fa-code" title="Developer-First Design" %}}
-Simple gRPC API, Playwright integration, and intuitive web interface for monitoring test runs.
+Simple gRPC ingestion, Playwright integration, and an intuitive web interface for monitoring test runs.
 {{% /blocks/feature %}}
 
 {{% blocks/feature icon="fa-chart-line" title="Test Analytics" %}}
@@ -54,7 +54,8 @@ graph TB
         C[Ingestion Service<br/>gRPC]
         D[NATS JetStream]
         E[Processor Service]
-        F[Database<br/>MongoDB]
+        F[(PostgreSQL<br/>Canonical Run Data)]
+        J[(MongoDB<br/>Live Step Buffer)]
         G[API Service]
     end
 
@@ -68,16 +69,18 @@ graph TB
     C --> D
     D --> E
     E --> F
+    E --> J
     F --> G
     G --> H
     D -.->|Stream| G
-    G -.->|WebSocket| I
+
     I --> H
 
     style C fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
     style D fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
     style E fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
     style F fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    style J fill:#1f6feb,stroke:#fff,stroke-width:2px,color:#fff
     style G fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
 ```
 

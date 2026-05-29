@@ -53,13 +53,19 @@ export default defineConfig({
     [
       "@stanterprise/playwright-reporter",
       {
-        grpcAddress: "localhost:50051", // Observer gRPC server address
+        grpcAddress: "localhost:50051", // Full gRPC address
+        // grpcHost/grpcPort are used only when grpcAddress is not provided
+        grpcHost: "localhost",
+        grpcPort: 50051,
         grpcEnabled: true, // Enable/disable reporting
         grpcTimeout: 1000, // Timeout for gRPC calls (ms)
         grpcMaxMessageSize: 104857600, // Max message size (100MB)
         maxAttachmentSize: 10485760, // Max attachment size (10MB)
         grpcMaxRetries: 3, // Max retry attempts
         grpcRetryDelay: 100, // Initial retry delay (ms)
+        tls: true, // Use TLS for gRPC connection
+        debug: false, // Write outgoing gRPC messages to JSONL
+        debugFile: "stanterprise-debug.jsonl", // JSONL output path
         verbose: false, // Enable verbose logging
       },
     ],
@@ -69,16 +75,21 @@ export default defineConfig({
 
 ### Configuration Table
 
-| Option               | Type    | Default           | Description                                     |
-| -------------------- | ------- | ----------------- | ----------------------------------------------- |
-| `grpcAddress`        | string  | `localhost:50051` | Observer gRPC server address                    |
-| `grpcEnabled`        | boolean | `true`            | Enable/disable gRPC reporting                   |
-| `grpcTimeout`        | number  | `1000`            | Timeout for gRPC calls in milliseconds          |
-| `grpcMaxMessageSize` | number  | `104857600`       | Max message size in bytes (100MB)               |
-| `maxAttachmentSize`  | number  | `10485760`        | Max attachment content size (10MB)              |
-| `grpcMaxRetries`     | number  | `3`               | Maximum retry attempts for failed calls         |
-| `grpcRetryDelay`     | number  | `100`             | Initial delay for retries (exponential backoff) |
-| `verbose`            | boolean | `false`           | Enable verbose logging                          |
+| Option               | Type    | Default                    | Description                                                                                          |
+| -------------------- | ------- | -------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `grpcAddress`        | string  | `localhost:50051`          | Full gRPC address. Takes precedence over `grpcHost` and `grpcPort`.                                  |
+| `grpcHost`           | string  | unset                      | gRPC host used when `grpcAddress` is not provided.                                                   |
+| `grpcPort`           | number  | `50051`                    | gRPC port used with `grpcHost` when `grpcAddress` is not provided.                                   |
+| `grpcEnabled`        | boolean | `true`                     | Enable/disable gRPC reporting.                                                                       |
+| `grpcTimeout`        | number  | `1000`                     | Timeout for gRPC calls in milliseconds.                                                              |
+| `grpcMaxMessageSize` | number  | `104857600`                | Max gRPC message size in bytes (100MB).                                                              |
+| `maxAttachmentSize`  | number  | `10485760`                 | Max attachment content size in bytes (10MB). Larger attachments keep path metadata and skip content. |
+| `grpcMaxRetries`     | number  | `3`                        | Maximum retry attempts for failed calls.                                                             |
+| `grpcRetryDelay`     | number  | `100`                      | Initial delay for retries in milliseconds (exponential backoff).                                     |
+| `tls`                | boolean | `true`                     | Use TLS for gRPC connections.                                                                        |
+| `debug`              | boolean | `false`                    | Enable debug mode and write outgoing gRPC messages to JSONL.                                         |
+| `debugFile`          | string  | `stanterprise-debug.jsonl` | Path to debug JSONL output when `debug` is enabled. Parent directories are created automatically.    |
+| `verbose`            | boolean | `false`                    | Enable verbose logging.                                                                              |
 
 ## Environment Variables
 
@@ -87,7 +98,14 @@ Configure the reporter using environment variables:
 ```bash
 # Server configuration
 STANTERPRISE_GRPC_ADDRESS=myserver.com:50051
+STANTERPRISE_GRPC_HOST=myserver.com
+STANTERPRISE_GRPC_PORT=50051
 STANTERPRISE_GRPC_ENABLED=true
+STANTERPRISE_GRPC_TLS=true
+
+# Debug configuration
+STANTERPRISE_DEBUG=false
+STANTERPRISE_DEBUG_FILE=stanterprise-debug.jsonl
 
 # Custom metadata (prefix will be stripped)
 STANTERPRISE_META_BUILD_ID=12345
@@ -95,6 +113,16 @@ STANTERPRISE_META_BRANCH=main
 STANTERPRISE_META_COMMIT_SHA=abc123
 STANTERPRISE_META_CI_PIPELINE=github-actions
 ```
+
+### Environment Variable Notes
+
+- `grpcAddress` resolution order:
+  1. `grpcAddress` option
+  2. `STANTERPRISE_GRPC_ADDRESS`
+  3. `STANTERPRISE_GRPC_HOST` + `STANTERPRISE_GRPC_PORT`
+  4. `grpcHost` + `grpcPort` options
+  5. `localhost:50051`
+- Boolean env values for `STANTERPRISE_GRPC_ENABLED`, `STANTERPRISE_GRPC_TLS`, and `STANTERPRISE_DEBUG` are matched case-insensitively.
 
 ### Custom Metadata
 
@@ -138,9 +166,35 @@ To disable retries:
 
 ```typescript
 {
-  grpcMaxRetries: 0; // No retries, fail fast
+  grpcMaxRetries: 0, // No retries, fail fast
 }
 ```
+
+## Debug Mode
+
+Enable debug mode to capture outgoing gRPC payloads to JSONL for troubleshooting.
+
+```typescript
+export default defineConfig({
+  reporter: [
+    [
+      "@stanterprise/playwright-reporter",
+      {
+        debug: true,
+        debugFile: "debug-output.jsonl",
+      },
+    ],
+  ],
+});
+```
+
+Or via environment variables:
+
+```bash
+STANTERPRISE_DEBUG=true STANTERPRISE_DEBUG_FILE=debug-output.jsonl npx playwright test
+```
+
+Debug output may include sensitive request payloads and can grow large. Use only in controlled environments.
 
 ## Sharding Support
 
@@ -257,7 +311,7 @@ export default defineConfig({
     [
       "@stanterprise/playwright-reporter",
       {
-        grpcAddress: process.env.OBSERVER_GRPC_ADDRESS || "localhost:50051",
+        grpcAddress: process.env.STANTERPRISE_GRPC_ADDRESS || "localhost:50051",
         verbose: process.env.CI === "true",
         grpcMaxRetries: 5, // More retries in CI
       },
@@ -350,7 +404,7 @@ This error typically occurs due to large attachments exceeding message size limi
 3. **Enable verbose logging** to monitor sizes:
    ```typescript
    {
-     verbose: true;
+     verbose: true,
    }
    ```
 

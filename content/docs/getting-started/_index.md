@@ -26,6 +26,7 @@ The fastest way to get started is using the all-in-one Docker image:
 docker run -d \
   -p 3000:80 \
   -p 50051:50051 \
+  -p 5432:5432 \
   -v observer-data:/data \
   --name observer \
   ghcr.io/stanterprise/observer/aio:latest
@@ -35,6 +36,7 @@ This starts Observer with:
 
 - Web UI on port 3000 (http://localhost:3000)
 - gRPC endpoint on port 50051
+- PostgreSQL on port 5432 (for local inspection)
 
 ### 2. Install the Playwright Reporter
 
@@ -78,6 +80,8 @@ npx playwright test
 
 Open http://localhost:3000 in your browser to see your test results in real-time!
 
+You can also explore the read-only hosted demo at [https://observer.rocks](https://observer.rocks).
+
 ## Quick Start with Kubernetes/Helm
 
 For production deployments, use Helm:
@@ -97,8 +101,8 @@ Configure your Playwright tests to point to your Kubernetes service endpoint.
 
 Observer supports two deployment modes:
 
-- **All-in-One (AIO)**: Single container with embedded services - perfect for local development and CI
-- **Distributed Mode**: Multi-container deployment with separate ingestion, processor, API, and web services - ideal for production
+- **All-in-One (AIO)**: Single container with embedded NATS, PostgreSQL, MongoDB, ingestion, processor, API, and web
+- **Distributed Mode**: Multi-container deployment with separate ingestion, processor, API, and web services
 
 ## Next Steps
 
@@ -108,6 +112,7 @@ Now that Observer is running, explore these topics:
 - [Architecture](/docs/architecture/) - Understand how Observer works
 - [Integrations](/docs/integrations/) - Configure the Playwright reporter
 - [Demo](/docs/demo/) - Try Observer with sample applications
+- [Roadmap](/docs/roadmap/) - View upcoming planning areas
 
 ## Getting Help
 

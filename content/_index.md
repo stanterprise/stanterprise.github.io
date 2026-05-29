@@ -1,5 +1,6 @@
 ---
 title: Observer
+mermaid: true
 ---
 
 {{< blocks/cover title="Observer" image_anchor="top" height="full" >}}
@@ -43,7 +44,7 @@ Works seamlessly with Playwright tests via our custom reporter. Kubernetes and D
 
 Observer is built on a modern, event-driven architecture designed for scalability and real-time test monitoring.
 
-```mermaid
+<pre class="mermaid">
 graph TB
     subgraph "Test Execution"
         A[Playwright Tests]
@@ -51,17 +52,17 @@ graph TB
     end
 
     subgraph "Observer Platform"
-        C[Ingestion Service<br/>gRPC]
+        C[Ingestion Service&lt;br/&gt;gRPC]
         D[NATS JetStream]
         E[Processor Service]
-        F[(PostgreSQL<br/>Canonical Run Data)]
-        J[(MongoDB<br/>Live Step Buffer)]
+        F[(PostgreSQL&lt;br/&gt;Canonical Run Data)]
+        J[(MongoDB&lt;br/&gt;Live Step Buffer)]
         G[API Service]
     end
 
     subgraph "User Interface"
-        H[Web Dashboard<br/>React]
-        I[WebSocket<br/>Real-Time]
+        H[Web Dashboard&lt;br/&gt;React]
+        I[WebSocket&lt;br/&gt;Real-Time]
     end
 
     A --> B
@@ -73,7 +74,6 @@ graph TB
     F --> G
     G --> H
     D -.->|Stream| G
-
     I --> H
 
     style C fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
@@ -82,7 +82,7 @@ graph TB
     style F fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
     style J fill:#1f6feb,stroke:#fff,stroke-width:2px,color:#fff
     style G fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
-```
+</pre>
 
 {{% /blocks/section %}}
 

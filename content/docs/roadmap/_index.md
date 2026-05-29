@@ -1,19 +1,12 @@
 ---
 title: Roadmap
 weight: 6
-description: Product roadmap scaffold for upcoming Observer milestones
+description: Current Observer roadmap themes and target windows
 ---
 
 # Observer Roadmap
 
-This page is a planning scaffold for the Observer roadmap. Add or edit the bullet points in each section and we can expand them into full release notes and implementation plans.
-
-## How to Use This Page
-
-- Keep each roadmap item short and outcome-focused
-- Group items by timeline and priority
-- Link to issues or pull requests when available
-- Mark status updates as work progresses
+This page captures the current product direction for Observer. Targets are approximate and may shift as implementation details firm up.
 
 ## Status Legend
 
@@ -22,63 +15,35 @@ This page is a planning scaffold for the Observer roadmap. Add or edit the bulle
 - Blocked
 - Released
 
-## Now (Current Cycle)
+## Now
 
-Add immediate priorities for the active cycle.
+| Item           | Target  | Status  | Notes                                                                                             |
+| -------------- | ------- | ------- | ------------------------------------------------------------------------------------------------- |
+| Pytest support | Q3 2026 | Planned | Prioritize parity with the existing Playwright reporter flow before expanding framework coverage. |
 
-### Candidate Items
+## Next
 
-- [ ] Item title
-  - Owner:
-  - Status:
-  - Target:
-  - Notes:
+| Item                       | Target  | Status  | Notes                                                                                  |
+| -------------------------- | ------- | ------- | -------------------------------------------------------------------------------------- |
+| MCP Server                 | Q3 2026 | Planned | Focus on a minimal, stable interface that can expose Observer data and actions safely. |
+| Manager View               | Q4 2026 | Planned | Tailor the experience for higher-level run summaries and team-level reporting.         |
+| JUnit 5 support            | Q4 2026 | Planned | Align the reporter model with JUnit 5 lifecycle events and metadata.                   |
+| GitHub Actions integration | Q4 2026 | Planned | Keep setup lightweight so it is easy to adopt in existing CI workflows.                |
 
-- [ ] Item title
-  - Owner:
-  - Status:
-  - Target:
-  - Notes:
+## Later
 
-## Next (Upcoming Cycle)
-
-Add items expected after the current cycle.
-
-### Candidate Items
-
-- [ ] Item title
-  - Owner:
-  - Status:
-  - Target:
-  - Notes:
-
-- [ ] Item title
-  - Owner:
-  - Status:
-  - Target:
-  - Notes:
-
-## Later (Backlog)
-
-Add directional ideas that are not scheduled yet.
-
-### Candidate Items
-
-- [ ] Item title
-  - Hypothesis:
-  - Dependencies:
-  - Risks:
-  - Notes:
-
-- [ ] Item title
-  - Hypothesis:
-  - Dependencies:
-  - Risks:
-  - Notes:
+| Item                      | Notes                                   |
+| ------------------------- | --------------------------------------- |
+| Executive Summary View    | High-level reporting for stakeholders   |
+| OpenTelemetry integration | Future observability export path        |
+| JUnit XML importer        | Broader test result ingestion support   |
+| .NET ecosystem            | Potential new reporter surface          |
+| Prometheus / Grafana      | Metrics export and dashboarding         |
+| Datadog integration       | Third-party observability compatibility |
+| Slack integration         | Alerting and notifications              |
+| Cypress                   | Additional test framework support       |
 
 ## Cross-Cutting Themes
-
-Track larger themes that span multiple roadmap items.
 
 - Reliability and correctness
 - Developer experience
@@ -88,25 +53,10 @@ Track larger themes that span multiple roadmap items.
 
 ## Dependencies and Risks
 
-Track external dependencies and known risks.
+- Dependency: External reporter and framework support maturity
+  - Impact: May affect target dates for new integrations
+  - Mitigation: Keep roadmap items modular and independently shippable
 
-- Dependency:
-  - Impact:
-  - Mitigation:
-
-- Risk:
-  - Impact:
-  - Mitigation:
-
-## Changelog Seed
-
-Use this section as the source for future release-note expansion.
-
-### Unreleased
-
-- Added:
-- Changed:
-- Fixed:
-- Deprecated:
-- Removed:
-- Security:
+- Risk: Scope growth in cross-framework support
+  - Impact: Can delay core Observer improvements
+  - Mitigation: Prioritize the smallest useful integration slice first

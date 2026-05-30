@@ -32,16 +32,20 @@ This page captures the current product direction for Observer. Targets are appro
 
 ## Later
 
-| Item                      | Notes                                   |
-| ------------------------- | --------------------------------------- |
-| Executive Summary View    | High-level reporting for stakeholders   |
-| OpenTelemetry integration | Future observability export path        |
-| JUnit XML importer        | Broader test result ingestion support   |
-| .NET ecosystem            | Potential new reporter surface          |
-| Prometheus / Grafana      | Metrics export and dashboarding         |
-| Datadog integration       | Third-party observability compatibility |
-| Slack integration         | Alerting and notifications              |
-| Cypress                   | Additional test framework support       |
+| Item                               | Notes                                                                                                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Executive Summary View             | High-level reporting for stakeholders                                                                                                                                          |
+| OpenTelemetry integration          | Future observability export path                                                                                                                                               |
+| JUnit XML importer                 | Broader test result ingestion support                                                                                                                                          |
+| .NET ecosystem                     | Potential new reporter surface                                                                                                                                                 |
+| Prometheus / Grafana               | Metrics export and dashboarding                                                                                                                                                |
+| Datadog integration                | Third-party observability compatibility                                                                                                                                        |
+| Slack integration                  | Alerting and notifications                                                                                                                                                     |
+| Cypress                            | Additional test framework support                                                                                                                                              |
+| AI-assisted failure clustering     | Failure root-cause inference                                                                                                                                                   |
+| AI-assisted test health assessment | Analyze tests in detail to produce optimization an improvement suggestions                                                                                                     |
+| Duration-based shard balancing     | TS Playwright-specific: receive an input of tests that are intended to be run and a desired number of shards, return shard test files balanced by execution time and not count |
+| CI/CD cost optimization            | Provide recommendations on CI/CD configuration to reduce execution time and save on infra costs                                                                                |
 
 ## Cross-Cutting Themes
 

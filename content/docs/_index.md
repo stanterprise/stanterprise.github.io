@@ -1,65 +1,32 @@
 ---
-title: Documentation
+title: Observer Documentation
 linkTitle: Docs
+description: Evaluate, install, integrate, and operate Observer test observability.
 ---
 
-# Observer Documentation
+Choose a path based on what you need to do.
 
-Welcome to the Observer documentation. Observer is a test observability system for Playwright pipelines that ingests execution events over gRPC, processes them through NATS JetStream, and exposes run data through a REST API and Web UI.
+## Evaluate Observer
 
-## Getting Started
+- [Why Observer?](/docs/why-observer/) - Understand test observability and how it differs from end-of-run reporting.
+- [Live Demo](/docs/demo/) - Explore sample runs and test details in the hosted Observer UI.
+- [Architecture](/docs/architecture/) - See how events move through Observer and where run data is stored.
 
-New to Observer? Start here:
+## Start Using Observer
 
-- [Getting Started Guide](/docs/getting-started/) - Quick start guide to get Observer up and running
-- [Installation](/docs/install/) - Deployment instructions for Docker and Kubernetes/Helm
-- [Architecture](/docs/architecture/) - Understanding Observer's distributed architecture
-- [Integrations](/docs/integrations/) - Connect Observer with Playwright and your CI/CD pipeline
-- [Playwright Reporter](/docs/integrations/playwright-reporter/) - Detailed guide for the Playwright reporter
-- [Demo](/docs/demo/) - Run a realistic local demo flow with Playwright
-- [Roadmap](/docs/roadmap/) - Planning scaffold for upcoming Observer milestones
+- [Getting Started](/docs/getting-started/) - Run Observer locally and send your first Playwright events.
+- [Installation](/docs/install/) - Choose AIO, Docker Compose, or Kubernetes/Helm deployment.
+- [Playwright Reporter](/docs/integrations/playwright-reporter/) - Install and configure the current npm reporter.
 
-## Key Features
+## Operate Observer
 
-Observer provides comprehensive test observability for modern CI/CD pipelines:
+- [Deployment and configuration](/docs/install/) - Review deployment modes, service settings, and verification steps.
+- [Architecture](/docs/architecture/) - Review PostgreSQL, MongoDB, NATS, API, and WebSocket responsibilities.
 
-- **Real-Time Test Monitoring**: Track test execution in real-time with WebSocket streaming
-- **Run and Test Analytics**: Inspect run-level status, test outcomes, and trends
-- **Step-by-Step Tracking**: Monitor individual test steps with timing and status information
-- **Attachment Management**: Automatically handle screenshots, videos, and trace files
-- **Sharding Support**: Aggregate results from parallel test execution
-- **Flexible Deployment**: Choose between All-in-One mode for simplicity or Distributed mode for scalability
+## Extend Observer
 
-## Architecture
+- [REST API and WebSocket overview](/docs/architecture/#5-api-service) - Find the currently documented query and live-event interfaces.
+- [Integrations](/docs/integrations/) - See the supported Playwright integration and CI examples.
+- [Roadmap](/docs/roadmap/) - Check the status of additional reporters and planned capabilities.
 
-Observer is built on a modern, event-driven architecture:
-
-- **Ingestion Service**: gRPC endpoint for receiving test events
-- **NATS JetStream**: Message broker for reliable event streaming
-- **Processor Service**: Consumes events and persists durable run data to PostgreSQL
-- **API Service**: Provides REST endpoints and WebSocket streaming
-- **Web UI**: React-based dashboard for visualizing test runs
-- **MongoDB (limited scope)**: Live in-flight step buffering only
-
-## Quick Links
-
-### For Developers
-
-- [Playwright Reporter Configuration](/docs/integrations/playwright-reporter/) - Configure the reporter in your tests
-- [CI/CD Integration](/docs/integrations/#cicd-integrations) - Integrate with GitHub Actions, GitLab CI, Jenkins
-
-### For DevOps
-
-- [Docker Deployment](/docs/install/) - Run Observer with Docker
-- [Kubernetes/Helm](/docs/install/) - Deploy Observer on Kubernetes
-- [Configuration](/docs/integrations/#observer-configuration) - Configure reporter and services
-
-## Repositories
-
-- **Observer**: [github.com/stanterprise/observer](https://github.com/stanterprise/observer)
-- **Playwright Reporter**: [github.com/stanterprise/playwright-reporter](https://github.com/stanterprise/playwright-reporter)
-- **NPM Package**: [npmjs.com/package/@stanterprise/playwright-reporter](https://www.npmjs.com/package/@stanterprise/playwright-reporter)
-
-## Support
-
-Need help? Check out our [Community](/community/) page for support options.
+Playwright is the available reporter integration. Pytest and Mocha reporter work is in progress; other frameworks and MCP are not presented as currently supported interfaces.

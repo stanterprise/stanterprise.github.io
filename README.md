@@ -1,6 +1,6 @@
 # Observer Documentation Site
 
-This repository contains the documentation website for Observer, a comprehensive developer tool for modern observability.
+This repository contains the canonical public documentation website for Observer, an open-source test observability system.
 
 ## Built With
 
@@ -66,6 +66,12 @@ The site is automatically deployed to GitHub Pages when changes are pushed to th
   - `integrations/` - Integration guides
   - `demo/` - Demo and sample applications
 - `content/community/` - Community resources
+
+## Documentation Ownership
+
+This website owns end-user product documentation, including getting started, installation, integrations, deployment guidance, supported capabilities, and the public roadmap. The Observer repository owns contributor setup, build and test commands, component internals, migrations, Helm implementation details, specifications, and other code-adjacent documentation.
+
+Use [observer.stanterprise.com](https://observer.stanterprise.com/) as the canonical source for end-user guidance. See the [Observer repository](https://github.com/stanterprise/observer) for development and contribution documentation.
 
 ## Contributing
 

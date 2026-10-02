@@ -5,6 +5,7 @@ mermaid: true
 ---
 
 {{< blocks/cover title="Test observability" image_anchor="top" height="min" >}}
+
 <p class="lead mt-3">For your automation pipeline: follow Playwright runs live, then investigate failures, retries, steps, timing, metadata, and attachments.</p>
 <a class="btn btn-lg btn-primary me-3 mb-3" href="https://observer.rocks">
 Try the Live Demo <i class="fas fa-arrow-alt-circle-right ms-2"></i>
@@ -16,6 +17,7 @@ Get Started <i class="fas fa-arrow-alt-circle-right ms-2"></i>
 {{< /blocks/cover >}}
 
 {{% blocks/section color="white" %}}
+
 ## From end-of-run reports to test observability
 
 Traditional test reports summarize results after a run completes. Observer receives test events during execution, so teams can follow progress as it happens, inspect failures in context, and compare behavior across runs.
@@ -41,6 +43,7 @@ Use the Playwright reporter today. Pytest and Mocha reporter work is in progress
 {{% /blocks/section %}}
 
 {{% blocks/section color="white" %}}
+
 ## See the run, then inspect the test
 
 Explore a run list and a detailed test execution view from the public demo. The screenshots show sample product data.
@@ -62,6 +65,7 @@ Explore a run list and a detailed test execution view from the public demo. The 
 {{% /blocks/section %}}
 
 {{% blocks/section color="white" %}}
+
 ## How Observer works
 
 Test events flow through a durable processing pipeline. PostgreSQL stores run data for API queries; MongoDB is limited to buffering in-flight steps.
@@ -82,6 +86,7 @@ graph LR
 {{% /blocks/section %}}
 
 {{% blocks/section color="primary" %}}
+
 ## Put your next test run in view
 
 <a class="btn btn-lg btn-light me-3 mb-3" href="https://observer.rocks">

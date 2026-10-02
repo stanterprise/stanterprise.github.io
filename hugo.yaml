@@ -100,20 +100,17 @@ menu:
     - name: Docs
       weight: 10
       url: /docs/
-    - name: Architecture
-      weight: 20
-      url: /docs/architecture/
     - name: Integrations
-      weight: 30
+      weight: 20
       url: /docs/integrations/
+    - name: Deployment
+      weight: 30
+      url: /docs/install/
     - name: Demo
       weight: 40
       url: /docs/demo/
-    - name: Community
-      weight: 50
-      url: /community/
     - name: GitHub
-      weight: 60
+      weight: 50
       url: https://github.com/stanterprise/observer
       pre: <i class='fab fa-github'></i>
 

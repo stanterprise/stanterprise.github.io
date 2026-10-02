@@ -1,12 +1,12 @@
 ---
 title: Roadmap
 weight: 6
-description: Current Observer roadmap themes and target windows
+description: Current Observer roadmap themes and statuses
 ---
 
 # Observer Roadmap
 
-This page captures the current product direction for Observer. Targets are approximate and may shift as implementation details firm up.
+This page captures the current product direction for Observer. Statuses reflect current planning and may change as implementation evolves.
 
 ## Status Legend
 

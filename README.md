@@ -21,18 +21,21 @@ This repository contains the documentation website for Observer, a comprehensive
 ### Setup
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/stanterprise/stanterprise.github.io.git
    cd stanterprise.github.io
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    hugo mod get
    ```
 
 3. Run the development server:
+
    ```bash
    hugo server
    ```

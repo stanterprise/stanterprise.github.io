@@ -12,11 +12,11 @@ This repository contains the documentation website for Observer, a comprehensive
 
 ### Prerequisites
 
-- [Hugo Extended](https://gohugo.io/installation/) v0.121.1 or later (Extended version required for SCSS support)
+- [Hugo Extended](https://gohugo.io/installation/) v0.156.0 or later (Extended version required for SCSS support)
 - [Go](https://golang.org/dl/) v1.21 or later
-- [Node.js](https://nodejs.org/) v18 or later
+- [Node.js](https://nodejs.org/) v24 or later
 
-> **Note**: The GitHub Actions workflow uses Hugo v0.121.1. For consistency, it's recommended to use the same version for local development.
+> **Note**: The GitHub Actions workflow uses Hugo v0.156.0 and Node.js v24. For consistency, use these versions for local development.
 
 ### Setup
 
@@ -51,18 +51,18 @@ The generated site will be in the `public/` directory.
 
 ## Deployment
 
-The site is automatically deployed to GitHub Pages when changes are pushed to the `master` branch via GitHub Actions.
+The site is automatically deployed to GitHub Pages when changes are pushed to the `master` or `main` branch via GitHub Actions.
 
 ## Content Structure
 
-- `content/en/_index.md` - Home page
-- `content/en/docs/` - Documentation sections
+- `content/_index.md` - Home page
+- `content/docs/` - Documentation sections
   - `getting-started/` - Quick start guide
   - `install/` - Installation instructions
   - `architecture/` - Architecture overview
   - `integrations/` - Integration guides
   - `demo/` - Demo and sample applications
-- `content/en/community/` - Community resources
+- `content/community/` - Community resources
 
 ## Contributing
 

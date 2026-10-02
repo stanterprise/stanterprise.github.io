@@ -57,7 +57,7 @@ Observer is built on a modern, event-driven architecture:
 ## Repositories
 
 - **Observer**: [github.com/stanterprise/observer](https://github.com/stanterprise/observer)
-- **Playwright Reporter**: [github.com/stanterprise/stanterprise-playwright-reporter](https://github.com/stanterprise/stanterprise-playwright-reporter)
+- **Playwright Reporter**: [github.com/stanterprise/playwright-reporter](https://github.com/stanterprise/playwright-reporter)
 - **NPM Package**: [npmjs.com/package/@stanterprise/playwright-reporter](https://www.npmjs.com/package/@stanterprise/playwright-reporter)
 
 ## Support

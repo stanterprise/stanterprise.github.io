@@ -330,10 +330,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "24"
 
       - name: Install dependencies
         run: npm ci
@@ -360,8 +360,10 @@ jobs:
       matrix:
         shard: [1, 2, 3, 4, 5]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
 
       - name: Install dependencies
         run: npm ci
@@ -442,6 +444,6 @@ import type {
 
 ## Resources
 
-- [Reporter GitHub Repository](https://github.com/stanterprise/stanterprise-playwright-reporter)
+- [Reporter GitHub Repository](https://github.com/stanterprise/playwright-reporter)
 - [Observer GitHub Repository](https://github.com/stanterprise/observer)
 - [NPM Package](https://www.npmjs.com/package/@stanterprise/playwright-reporter)

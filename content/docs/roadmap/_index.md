@@ -17,18 +17,19 @@ This page captures the current product direction for Observer. Targets are appro
 
 ## Now
 
-| Item           | Target  | Status  | Notes                                                                                             |
-| -------------- | ------- | ------- | ------------------------------------------------------------------------------------------------- |
-| Pytest support | Q3 2026 | Planned | Prioritize parity with the existing Playwright reporter flow before expanding framework coverage. |
+| Item           | Status      | Notes                                                                                             |
+| -------------- | ----------- | ------------------------------------------------------------------------------------------------- |
+| Pytest support | In Progress | Prioritize parity with the existing Playwright reporter flow before expanding framework coverage. |
+| Mocha support  | In Progress | Reporter implementation is underway.                                                              |
 
 ## Next
 
-| Item                       | Target  | Status  | Notes                                                                                  |
-| -------------------------- | ------- | ------- | -------------------------------------------------------------------------------------- |
-| MCP Server                 | Q3 2026 | Planned | Focus on a minimal, stable interface that can expose Observer data and actions safely. |
-| Manager View               | Q4 2026 | Planned | Tailor the experience for higher-level run summaries and team-level reporting.         |
-| JUnit 5 support            | Q4 2026 | Planned | Align the reporter model with JUnit 5 lifecycle events and metadata.                   |
-| GitHub Actions integration | Q4 2026 | Planned | Keep setup lightweight so it is easy to adopt in existing CI workflows.                |
+| Item                       | Status  | Notes                                                                                  |
+| -------------------------- | ------- | -------------------------------------------------------------------------------------- |
+| MCP Server                 | Planned | Focus on a minimal, stable interface that can expose Observer data and actions safely. |
+| Manager View               | Planned | Tailor the experience for higher-level run summaries and team-level reporting.         |
+| JUnit 5 support            | Planned | Align the reporter model with JUnit 5 lifecycle events and metadata.                   |
+| GitHub Actions integration | Planned | Keep setup lightweight so it is easy to adopt in existing CI workflows.                |
 
 ## Later
 

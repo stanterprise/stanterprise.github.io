@@ -1,4 +1,4 @@
-baseURL: https://stanterprise.github.io/
+baseURL: https://observer.stanterprise.com/
 languageCode: en-us
 title: Observer
 
@@ -66,9 +66,9 @@ params:
   links:
     developer:
       - name: GitHub
-        url: https://github.com/stanterprise/stanterprise.github.io
+        url: https://github.com/stanterprise/observer
         icon: fab fa-github
-        desc: Development takes place here!
+        desc: Observer source repository
 
 # Module configuration for Docsy
 module:
@@ -114,7 +114,7 @@ menu:
       url: /community/
     - name: GitHub
       weight: 60
-      url: https://github.com/stanterprise/stanterprise.github.io
+      url: https://github.com/stanterprise/observer
       pre: <i class='fab fa-github'></i>
 
 # Build configuration

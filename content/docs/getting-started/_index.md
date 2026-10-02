@@ -117,5 +117,5 @@ Now that Observer is running, explore these topics:
 ## Getting Help
 
 - Visit the [Observer GitHub repository](https://github.com/stanterprise/observer) for issues
-- Check the [Reporter GitHub repository](https://github.com/stanterprise/stanterprise-playwright-reporter) for reporter issues
+- Check the [Reporter GitHub repository](https://github.com/stanterprise/playwright-reporter) for reporter issues
 - Join our [Community](/community/) for support

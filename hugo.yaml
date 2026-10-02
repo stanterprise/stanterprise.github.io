@@ -30,7 +30,7 @@ languages:
     languageName: English
     weight: 1
     params:
-      description: Developer tool for observability
+      description: Open-source test observability for automated test execution.
 
 # Markup configuration
 markup:
@@ -109,6 +109,9 @@ menu:
     - name: Demo
       weight: 40
       url: /docs/demo/
+    - name: Design Partners
+      weight: 45
+      url: /design-partners/
     - name: GitHub
       weight: 50
       url: https://github.com/stanterprise/observer

@@ -29,3 +29,4 @@ Test observability makes execution evidence visible and searchable. That evidenc
 - [Try the live demo](/docs/demo/)
 - [Get started](/docs/getting-started/)
 - [Read the architecture overview](/docs/architecture/)
+- [Learn about design partnering](/design-partners/)

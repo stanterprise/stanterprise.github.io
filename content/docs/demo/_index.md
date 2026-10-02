@@ -16,6 +16,15 @@ A public read-only demo is available at:
 
 Use it to explore the Observer UI and sample run data without changing system state.
 
+### What to Inspect in the Hosted Demo
+
+- Run history, pass/fail status, and execution duration.
+- A run's test details, attempts, and step-level information.
+- CI and run metadata where the sample includes it.
+- Retries and attachments on runs that contain them.
+
+The hosted data is read-only and representative, not a complete fixture of every Observer capability. Some details, such as attachments or retries, appear only when present in a sample run.
+
 ## Local Demo Option
 
 For full control and your own test data, run Observer locally.

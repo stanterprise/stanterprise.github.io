@@ -10,6 +10,7 @@ Choose a path based on what you need to do.
 
 - [Why Observer?](/docs/why-observer/) - Understand test observability and how it differs from end-of-run reporting.
 - [Live Demo](/docs/demo/) - Explore sample runs and test details in the hosted Observer UI.
+- [Design Partners](/design-partners/) - Check the project's stage and how to evaluate Observer with the maintainer.
 - [Architecture](/docs/architecture/) - See how events move through Observer and where run data is stored.
 
 ## Start Using Observer

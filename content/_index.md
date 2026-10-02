@@ -14,6 +14,7 @@ Try the Live Demo <i class="fas fa-arrow-alt-circle-right ms-2"></i>
 Get Started <i class="fas fa-arrow-alt-circle-right ms-2"></i>
 </a>
 <p class="mb-0">Open source and self-hostable. <a href="https://github.com/stanterprise/observer">Explore Observer on GitHub</a>.</p>
+<p class="mt-2 mb-0">Interested in shaping the product? <a href="/design-partners/">Explore the design-partner program</a>.</p>
 {{< /blocks/cover >}}
 
 {{% blocks/section color="white" %}}

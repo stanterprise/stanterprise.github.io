@@ -87,8 +87,8 @@ docker ps | grep observer
 # Kubernetes
 kubectl get pods
 
-# API health endpoint
-curl http://localhost:8080/health
+# API through the AIO web proxy
+curl http://localhost:3000/api/runs
 ```
 
 ## Troubleshooting

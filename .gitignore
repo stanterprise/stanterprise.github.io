@@ -26,3 +26,5 @@ yarn-error.log*
 # Hugo Module cache
 /go.sum
 /_vendor/
+
+docs/*

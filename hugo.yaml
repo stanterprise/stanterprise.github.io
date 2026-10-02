@@ -1,4 +1,4 @@
-baseURL: https://stanterprise.github.io/
+baseURL: https://observer.stanterprise.com/
 languageCode: en-us
 title: Observer
 
@@ -30,7 +30,7 @@ languages:
     languageName: English
     weight: 1
     params:
-      description: Developer tool for observability
+      description: Open-source test observability for automated test execution.
 
 # Markup configuration
 markup:
@@ -66,9 +66,9 @@ params:
   links:
     developer:
       - name: GitHub
-        url: https://github.com/stanterprise/stanterprise.github.io
+        url: https://github.com/stanterprise/observer
         icon: fab fa-github
-        desc: Development takes place here!
+        desc: Observer source repository
 
 # Module configuration for Docsy
 module:
@@ -100,21 +100,21 @@ menu:
     - name: Docs
       weight: 10
       url: /docs/
-    - name: Architecture
-      weight: 20
-      url: /docs/architecture/
     - name: Integrations
-      weight: 30
+      weight: 20
       url: /docs/integrations/
+    - name: Deployment
+      weight: 30
+      url: /docs/install/
     - name: Demo
       weight: 40
       url: /docs/demo/
-    - name: Community
-      weight: 50
-      url: /community/
+    - name: Design Partners
+      weight: 45
+      url: /design-partners/
     - name: GitHub
-      weight: 60
-      url: https://github.com/stanterprise/stanterprise.github.io
+      weight: 50
+      url: https://github.com/stanterprise/observer
       pre: <i class='fab fa-github'></i>
 
 # Build configuration

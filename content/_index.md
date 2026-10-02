@@ -1,99 +1,102 @@
 ---
 title: Observer
+description: Test observability for Playwright pipelines. Follow runs live and investigate failures, attempts, steps, attachments, and historical trends.
 mermaid: true
 ---
 
-{{< blocks/cover title="Observer" image_anchor="top" height="full" >}}
-<a class="btn btn-lg btn-primary me-3 mb-4" href="/docs/getting-started/">
+{{< blocks/cover title="Test observability" image_anchor="top" height="min" >}}
+
+<p class="lead mt-3">For your automation pipeline: follow Playwright runs live, then investigate failures, retries, steps, timing, metadata, and attachments.</p>
+<a class="btn btn-lg btn-primary me-3 mb-3" href="https://observer.rocks">
+Try the Live Demo <i class="fas fa-arrow-alt-circle-right ms-2"></i>
+</a>
+<a class="btn btn-lg btn-secondary me-3 mb-3" href="/docs/getting-started/">
 Get Started <i class="fas fa-arrow-alt-circle-right ms-2"></i>
 </a>
-<a class="btn btn-lg btn-secondary me-3 mb-4" href="https://github.com/stanterprise/observer">
-GitHub <i class="fab fa-github ms-2 "></i>
-</a>
-
-<p class="lead mt-5">Your comprehensive developer tool for modern observability</p>
+<p class="mb-0">Open source and self-hostable. <a href="https://github.com/stanterprise/observer">Explore Observer on GitHub</a>.</p>
+<p class="mt-2 mb-0">Interested in shaping the product? <a href="/design-partners/">Explore the design-partner program</a>.</p>
 {{< /blocks/cover >}}
 
-{{% blocks/lead color="primary" %}}
-Observer is a test observability system that collects test execution events, providing real-time insights into your test runs.
-Built for modern CI/CD pipelines, Observer helps teams understand test performance, track failures, and optimize test execution.
-{{% /blocks/lead %}}
+{{% blocks/section color="white" %}}
+
+## From end-of-run reports to test observability
+
+Traditional test reports summarize results after a run completes. Observer receives test events during execution, so teams can follow progress as it happens, inspect failures in context, and compare behavior across runs.
+{{% /blocks/section %}}
 
 {{% blocks/section color="dark" type="row" %}}
-{{% blocks/feature icon="fa-lightbulb" title="Real-Time Test Monitoring" %}}
-Track test execution in real-time with WebSocket streaming and comprehensive dashboards.
+{{% blocks/feature icon="fa-wave-square" title="Follow runs live" %}}
+Track run and test status while the suite is executing, with timing and CI metadata alongside the results.
 {{% /blocks/feature %}}
 
-{{% blocks/feature icon="fa-code" title="Developer-First Design" %}}
-Simple gRPC ingestion, Playwright integration, and an intuitive web interface for monitoring test runs.
+{{% blocks/feature icon="fa-list-check" title="Investigate each attempt" %}}
+Move from run summaries into test attempts, nested steps, durations, failures, and attached evidence.
 {{% /blocks/feature %}}
 
 {{% blocks/feature icon="fa-chart-line" title="Test Analytics" %}}
-Gain insights into test performance, failure patterns, and execution trends across your CI/CD pipeline.
+Review execution duration and outcomes across runs to spot changes in test behavior over time.
 {{% /blocks/feature %}}
 
-{{% blocks/feature icon="fa-plug" title="Easy Integration" %}}
-Works seamlessly with Playwright tests via our custom reporter. Kubernetes and Docker ready.
+{{% blocks/feature icon="fa-code-branch" title="Connect your pipeline" %}}
+Use the Playwright reporter today. Pytest and Mocha reporter work is in progress.
 {{% /blocks/feature %}}
 
 {{% /blocks/section %}}
 
 {{% blocks/section color="white" %}}
 
-## Architecture Overview
+## See the run, then inspect the test
 
-Observer is built on a modern, event-driven architecture designed for scalability and real-time test monitoring.
+Explore a run list and a detailed test execution view from the public demo. The screenshots show sample product data.
+
+<div class="row g-4 align-items-start">
+    <div class="col-lg-7">
+        <figure class="figure w-100">
+            <img class="figure-img img-fluid rounded border" src="/images/product/observer-run-history.png" alt="Observer run history listing test runs with status, duration, and passed, flaky, failed, and skipped counts.">
+            <figcaption class="figure-caption">Run history shows outcomes and duration across recent executions.</figcaption>
+        </figure>
+    </div>
+    <div class="col-lg-5">
+        <figure class="figure w-100">
+            <img class="figure-img img-fluid rounded border" src="/images/product/observer-test-details-steps.png" alt="Observer test detail showing a passed attempt, execution timing, hooks, and named test steps.">
+            <figcaption class="figure-caption">Test details connect attempt status and timing to the steps that ran.</figcaption>
+        </figure>
+    </div>
+</div>
+{{% /blocks/section %}}
+
+{{% blocks/section color="white" %}}
+
+## How Observer works
+
+Test events flow through a durable processing pipeline. PostgreSQL stores run data for API queries; MongoDB is limited to buffering in-flight steps.
 
 <pre class="mermaid">
-graph TB
-    subgraph "Test Execution"
-        A[Playwright Tests]
-        B[Reporter Plugin]
-    end
-
-    subgraph "Observer Platform"
-        C[Ingestion Service&lt;br/&gt;gRPC]
-        D[NATS JetStream]
-        E[Processor Service]
-        F[(PostgreSQL&lt;br/&gt;Canonical Run Data)]
-        J[(MongoDB&lt;br/&gt;Live Step Buffer)]
-        G[API Service]
-    end
-
-    subgraph "User Interface"
-        H[Web Dashboard&lt;br/&gt;React]
-        I[WebSocket&lt;br/&gt;Real-Time]
-    end
-
-    A --> B
-    B -->|gRPC Events| C
-    C --> D
-    D --> E
-    E --> F
-    E --> J
-    F --> G
-    G --> H
-    D -.->|Stream| G
-    I --> H
-
-    style C fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
-    style D fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
-    style E fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
-    style F fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
-    style J fill:#1f6feb,stroke:#fff,stroke-width:2px,color:#fff
-    style G fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+graph LR
+        Tests[Playwright tests] --> Reporter[Playwright reporter]
+        Reporter -->|gRPC events| Ingestion[gRPC ingestion]
+        Ingestion --> NATS[NATS JetStream]
+        NATS --> Processor[Processor]
+        Processor -->|Durable run data| PostgreSQL[(PostgreSQL)]
+        Processor -->|In-flight steps| MongoDB[(MongoDB buffer)]
+        PostgreSQL --> API[API and WebSocket]
+        NATS -.->|Live event relay| API
+        API --> UI[Observer web UI]
 </pre>
 
 {{% /blocks/section %}}
 
 {{% blocks/section color="primary" %}}
 
-## Get Started Today
+## Put your next test run in view
 
-Ready to improve your observability? Get started with Observer in minutes.
-
-<a class="btn btn-lg btn-light me-3 mb-4" href="/docs/getting-started/">
-  View Documentation <i class="fas fa-arrow-alt-circle-right ms-2"></i>
+<a class="btn btn-lg btn-light me-3 mb-3" href="https://observer.rocks">
+    Try the Live Demo <i class="fas fa-arrow-alt-circle-right ms-2"></i>
 </a>
-
+<a class="btn btn-lg btn-secondary me-3 mb-3" href="/docs/getting-started/">
+    Run Observer Locally <i class="fas fa-arrow-alt-circle-right ms-2"></i>
+</a>
+<a class="btn btn-lg btn-outline-light mb-3" href="/docs/">
+    Explore Documentation <i class="fas fa-arrow-alt-circle-right ms-2"></i>
+</a>
 {{% /blocks/section %}}

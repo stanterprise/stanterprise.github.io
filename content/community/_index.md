@@ -32,7 +32,6 @@ We welcome contributions of all kinds:
 See these guides:
 
 - [Observer CONTRIBUTING.md](https://github.com/stanterprise/observer/blob/master/CONTRIBUTING.md)
-- [Website CONTRIBUTING.md](https://github.com/stanterprise/stanterprise.github.io/blob/main/CONTRIBUTING.md)
 
 #### Documentation
 
@@ -73,7 +72,7 @@ Primary docs locations:
 
 - [Observer docs](https://github.com/stanterprise/observer/tree/master/docs)
 - [Observer service README](https://github.com/stanterprise/observer)
-- [Website docs source](https://github.com/stanterprise/stanterprise.github.io/tree/main/content/docs)
+- [Website docs source](https://github.com/stanterprise/stanterprise.github.io/tree/master/content/docs)
 
 ### Releases
 
@@ -90,7 +89,7 @@ Track releases and changes in the project repositories:
 
 ## Code of Conduct
 
-Our community is built on respect and inclusivity. Please read and follow our [Code of Conduct](https://github.com/stanterprise/stanterprise.github.io/blob/main/CODE_OF_CONDUCT.md).
+Our community is built on respect and inclusivity. Please read and follow the [Observer Code of Conduct](https://github.com/stanterprise/observer/blob/master/CODE_OF_CONDUCT.md).
 
 ## Support
 
